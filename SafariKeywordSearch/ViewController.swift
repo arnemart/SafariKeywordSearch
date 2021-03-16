@@ -9,42 +9,59 @@ import Cocoa
 import SafariServices.SFSafariApplication
 import SafariServices.SFSafariExtensionManager
 
-let appName = "SafariKeywordSearch"
-let extensionBundleIdentifier = "net.aurlien.SafariKeywordSearch.Extension"
-
-class ViewController: NSViewController {
+class ViewController: NSViewController, NSTextFieldDelegate {
 
     @IBOutlet var appNameLabel: NSTextField!
-    
+    @IBOutlet var openSafariPrefsButton: NSButton!
+    @IBOutlet var nameField: NSTextField!
+    @IBOutlet var keywordField: NSTextField!
+    @IBOutlet var expansionField: NSTextField!
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.appNameLabel.stringValue = appName
+        self.openSafariPrefsButton.isHidden = true
+        self.updatePrefsInfoAndButton()
+        
+        KeywordSearchData.instance.listen(listener: self.loadData)
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(updatePrefsInfoAndButton),
+                                               name: NSApplication.didBecomeActiveNotification,
+                                               object: nil)
+    }
+    
+    @objc private func updatePrefsInfoAndButton() {
         SFSafariExtensionManager.getStateOfSafariExtension(withIdentifier: extensionBundleIdentifier) { (state, error) in
             guard let state = state, error == nil else {
-                // Insert code to inform the user that something went wrong.
                 return
             }
 
             DispatchQueue.main.async {
                 if (state.isEnabled) {
-                    self.appNameLabel.stringValue = "\(appName)'s extension is currently on."
+                    self.appNameLabel.stringValue = ""
+                    self.openSafariPrefsButton.isHidden = true
                 } else {
-                    self.appNameLabel.stringValue = "\(appName)'s extension is currently off. You can turn it on in Safari Extensions preferences."
+                    self.appNameLabel.stringValue = "The Safari Keyword Search extension is currently disabled."
+                    self.openSafariPrefsButton.isHidden = false
                 }
             }
         }
     }
     
     @IBAction func openSafariExtensionPreferences(_ sender: AnyObject?) {
-        SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
-            guard error == nil else {
-                // Insert code to inform the user that something went wrong.
-                return
-            }
-
-            DispatchQueue.main.async {
-                NSApplication.shared.terminate(nil)
-            }
+        SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier)
+    }
+    
+    func loadData() {
+        let data = KeywordSearchData.instance.getCurrent()
+        self.nameField.stringValue = data.name
+        self.keywordField.stringValue = data.keyword
+        self.expansionField.stringValue = data.expansion
+    }
+    
+    func controlTextDidChange(_ notification: Notification) {
+        if let field = notification.object as! NSTextField? {
+            KeywordSearchData.instance.updateValue(field: field.identifier!.rawValue, value: field.stringValue)
         }
     }
 
