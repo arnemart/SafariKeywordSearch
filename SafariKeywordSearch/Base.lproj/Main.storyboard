@@ -13,18 +13,18 @@
                 <application id="hnw-xV-0zn" sceneMemberID="viewController">
                     <menu key="mainMenu" title="Main Menu" systemMenu="main" id="AYu-sK-qS6">
                         <items>
-                            <menuItem title="SafariKeywordSearch" id="1Xt-HY-uBw">
+                            <menuItem title="Keyword Search" id="1Xt-HY-uBw">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <menu key="submenu" title="SafariKeywordSearch" systemMenu="apple" id="uQy-DD-JDr">
+                                <menu key="submenu" title="Keyword Search" systemMenu="apple" id="uQy-DD-JDr">
                                     <items>
-                                        <menuItem title="About SafariKeywordSearch" id="5kV-Vb-QxS">
+                                        <menuItem title="About Keyword Search" id="5kV-Vb-QxS">
                                             <modifierMask key="keyEquivalentModifierMask"/>
                                             <connections>
                                                 <action selector="orderFrontStandardAboutPanel:" target="Ady-hI-5gd" id="Exp-CZ-Vem"/>
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="VOq-y0-SEH"/>
-                                        <menuItem title="Hide SafariKeywordSearch" keyEquivalent="h" id="Olw-nP-bQN">
+                                        <menuItem title="Hide Keyword Search" keyEquivalent="h" id="Olw-nP-bQN">
                                             <connections>
                                                 <action selector="hide:" target="Ady-hI-5gd" id="PnN-Uc-m68"/>
                                             </connections>
@@ -42,7 +42,7 @@
                                             </connections>
                                         </menuItem>
                                         <menuItem isSeparatorItem="YES" id="kCx-OE-vgT"/>
-                                        <menuItem title="Quit SafariKeywordSearch" keyEquivalent="q" id="4sb-4s-VLi">
+                                        <menuItem title="Quit Keyword Search" keyEquivalent="q" id="4sb-4s-VLi">
                                             <connections>
                                                 <action selector="terminate:" target="Ady-hI-5gd" id="Te7-pn-YzF"/>
                                             </connections>
@@ -274,7 +274,7 @@
                         <outlet property="delegate" destination="Voe-Tx-rLC" id="PrD-fu-P6m"/>
                     </connections>
                 </application>
-                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="SafariKeywordSearch" customModuleProvider="target"/>
+                <customObject id="Voe-Tx-rLC" customClass="AppDelegate" customModule="Keyword_Search" customModuleProvider="target"/>
                 <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
                 <customObject id="Ady-hI-5gd" userLabel="First Responder" customClass="NSResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -284,7 +284,7 @@
         <scene sceneID="1wa-X5-bkx">
             <objects>
                 <windowController id="ZvH-g8-Qbo" sceneMemberID="viewController">
-                    <window key="window" title="Safari Keyword Search Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="lVY-se-JKP">
+                    <window key="window" title="Keyword Search Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="" animationBehavior="default" id="lVY-se-JKP">
                         <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" fullSizeContentView="YES"/>
                         <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
                         <rect key="contentRect" x="425" y="462" width="480" height="270"/>
@@ -294,11 +294,8 @@
                             <rect key="frame" x="0.0" y="0.0" width="480" height="270"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </view>
-                        <toolbar key="toolbar" implicitIdentifier="09D11707-F4A3-4FD5-970E-AC5832E91C2B" autosavesConfiguration="NO" displayMode="iconAndLabel" sizeMode="regular" id="YTQ-gw-Wqp">
-                            <allowedToolbarItems>
-                                <toolbarItem implicitItemIdentifier="NSToolbarSpaceItem" id="wyK-7i-Fgf"/>
-                                <toolbarItem implicitItemIdentifier="NSToolbarFlexibleSpaceItem" id="4xQ-1k-RVz"/>
-                            </allowedToolbarItems>
+                        <toolbar key="toolbar" implicitIdentifier="09D11707-F4A3-4FD5-970E-AC5832E91C2B" autosavesConfiguration="NO" allowsUserCustomization="NO" displayMode="iconAndLabel" sizeMode="regular" id="YTQ-gw-Wqp">
+                            <allowedToolbarItems/>
                             <defaultToolbarItems/>
                         </toolbar>
                         <connections>
@@ -337,8 +334,8 @@
         <!--List View Controller-->
         <scene sceneID="O0m-Xf-1qt">
             <objects>
-                <viewController id="KLv-WC-cYs" customClass="ListViewController" customModule="SafariKeywordSearch" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" misplaced="YES" id="hbr-2Q-P7Y">
+                <viewController id="KLv-WC-cYs" customClass="ListViewController" customModule="Keyword_Search" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" id="hbr-2Q-P7Y">
                         <rect key="frame" x="0.0" y="0.0" width="210" height="480"/>
                         <autoresizingMask key="autoresizingMask"/>
                         <subviews>
@@ -451,7 +448,7 @@
         <!--View Controller-->
         <scene sceneID="Uj1-tb-tR5">
             <objects>
-                <viewController id="FMM-79-tHh" customClass="ViewController" customModule="SafariKeywordSearch" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="FMM-79-tHh" customClass="ViewController" customModule="Keyword_Search" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" id="epy-5N-Nya">
                         <rect key="frame" x="0.0" y="0.0" width="507" height="390"/>
                         <autoresizingMask key="autoresizingMask"/>

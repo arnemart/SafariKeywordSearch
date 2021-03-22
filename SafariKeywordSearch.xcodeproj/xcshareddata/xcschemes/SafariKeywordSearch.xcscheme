@@ -15,8 +15,8 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "08E9867825F3B841002234B3"
-               BuildableName = "SafariKeywordSearch.app"
-               BlueprintName = "SafariKeywordSearch"
+               BuildableName = "Keyword Search.app"
+               BlueprintName = "Keyword Search"
                ReferencedContainer = "container:SafariKeywordSearch.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -46,8 +46,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "08E9867825F3B841002234B3"
-            BuildableName = "SafariKeywordSearch.app"
-            BlueprintName = "SafariKeywordSearch"
+            BuildableName = "Keyword Search.app"
+            BlueprintName = "Keyword Search"
             ReferencedContainer = "container:SafariKeywordSearch.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
@@ -63,8 +63,8 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "08E9867825F3B841002234B3"
-            BuildableName = "SafariKeywordSearch.app"
-            BlueprintName = "SafariKeywordSearch"
+            BuildableName = "Keyword Search.app"
+            BlueprintName = "Keyword Search"
             ReferencedContainer = "container:SafariKeywordSearch.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

@@ -22,13 +22,15 @@ class ListViewController: NSViewController, NSTableViewDelegate, NSTableViewData
         let data = KeywordSearchData.instance
         self.enableUpdates = false
         self.listView.selectRowIndexes(IndexSet.init(integer: data.getSelected()), byExtendingSelection: false)
+        
         if (scrollOffset != nil) {
             self.listView.enclosingScrollView?.contentView.bounds.origin.y = scrollOffset!
-        } else {
-            Timer.scheduledTimer(withTimeInterval: 0.0, repeats: false) { _ in
-                self.listView.scrollRowToVisible(self.listView.selectedRow)
-            }
         }
+        
+        Timer.scheduledTimer(withTimeInterval: 0.0, repeats: false) { _ in
+            self.listView.scrollRowToVisible(self.listView.selectedRow)
+        }
+        
         self.enableUpdates = true
     }
 

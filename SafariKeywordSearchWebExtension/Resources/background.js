@@ -6,7 +6,9 @@ const searchDomains = {
     "duckduckgo.com": "q",
     "www.duckduckgo.com": "q",
     "bing.com": "q",
-    "www.bing.com": "q"
+    "www.bing.com": "q",
+    "ecosia.org": "q",
+    "www.ecosia.org": "q"
 }
 
 let searchData = {}
@@ -52,13 +54,21 @@ function getSearchParam(urlString) {
 
 function getSearch(searchParam, andThen) {
     loadData(() => {
-        let [first, ...rest] = searchParam.split(/\s+/)
-        if (searchData[first]) {
-            andThen(searchData[first]
-                .replace('%%%', rest.join('+'))
-                .replace('@@@', escape(rest.join('+')))
-                .replace(/\{\{@(.+?)@\}\}/g, (...m) => escape(rest.join(m[1])))
-                .replace(/\{\{%(.+?)%\}\}/g, (...m) => rest.join(m[1])))
+        let parts = searchParam.split(/\s+/)
+        let match = searchData[parts[0]]
+        let searchPhrase = parts.slice(1)
+
+        if (!match && parts.length > 1) {
+            match = searchData[parts[parts.length - 1]]
+            searchPhrase = parts.slice(0, -1)
+        }
+
+        if (match) {
+            andThen(match
+                .replace('%%%', searchPhrase.join('+'))
+                .replace('@@@', escape(searchPhrase.join('+')))
+                .replace(/\{\{@(.+?)@\}\}/g, (...m) => escape(searchPhrase.join(m[1])))
+                .replace(/\{\{%(.+?)%\}\}/g, (...m) => searchPhrase.join(m[1])))
         }
 
     })

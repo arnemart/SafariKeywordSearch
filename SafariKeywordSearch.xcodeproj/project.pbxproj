@@ -49,7 +49,7 @@
 
 /* Begin PBXFileReference section */
 		086CB59C25F9168100E9CC29 /* Data.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Data.swift; sourceTree = "<group>"; };
-		08E9867925F3B841002234B3 /* SafariKeywordSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SafariKeywordSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		08E9867925F3B841002234B3 /* Keyword Search.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Keyword Search.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		08E9867C25F3B841002234B3 /* SafariKeywordSearch.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SafariKeywordSearch.entitlements; sourceTree = "<group>"; };
 		08E9867D25F3B841002234B3 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		08E9868025F3B841002234B3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -100,7 +100,7 @@
 		08E9867A25F3B841002234B3 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				08E9867925F3B841002234B3 /* SafariKeywordSearch.app */,
+				08E9867925F3B841002234B3 /* Keyword Search.app */,
 				08E986DD25F53CA0002234B3 /* SafariKeywordSearchWebExtension.appex */,
 			);
 			name = Products;
@@ -154,9 +154,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		08E9867825F3B841002234B3 /* SafariKeywordSearch */ = {
+		08E9867825F3B841002234B3 /* Keyword Search */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 08E986C425F3B843002234B3 /* Build configuration list for PBXNativeTarget "SafariKeywordSearch" */;
+			buildConfigurationList = 08E986C425F3B843002234B3 /* Build configuration list for PBXNativeTarget "Keyword Search" */;
 			buildPhases = (
 				08E9867525F3B841002234B3 /* Sources */,
 				08E9867625F3B841002234B3 /* Frameworks */,
@@ -168,9 +168,9 @@
 			dependencies = (
 				08E986F625F53CA0002234B3 /* PBXTargetDependency */,
 			);
-			name = SafariKeywordSearch;
+			name = "Keyword Search";
 			productName = SafariKeywordSearch;
-			productReference = 08E9867925F3B841002234B3 /* SafariKeywordSearch.app */;
+			productReference = 08E9867925F3B841002234B3 /* Keyword Search.app */;
 			productType = "com.apple.product-type.application";
 		};
 		08E986DC25F53CA0002234B3 /* SafariKeywordSearchWebExtension */ = {
@@ -220,7 +220,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				08E9867825F3B841002234B3 /* SafariKeywordSearch */,
+				08E9867825F3B841002234B3 /* Keyword Search */,
 				08E986DC25F53CA0002234B3 /* SafariKeywordSearchWebExtension */,
 			);
 		};
@@ -343,7 +343,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -398,7 +398,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 11.1;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = macosx;
@@ -416,6 +416,7 @@
 				CODE_SIGN_ENTITLEMENTS = SafariKeywordSearch/SafariKeywordSearch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = SafariKeywordSearch/Info.plist;
@@ -439,6 +440,7 @@
 				CODE_SIGN_ENTITLEMENTS = SafariKeywordSearch/SafariKeywordSearch.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = SafariKeywordSearch/Info.plist;
@@ -458,6 +460,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SafariKeywordSearchWebExtension/SafariKeywordSearchWebExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = SafariKeywordSearchWebExtension/Info.plist;
@@ -479,6 +482,7 @@
 			buildSettings = {
 				CODE_SIGN_ENTITLEMENTS = SafariKeywordSearchWebExtension/SafariKeywordSearchWebExtension.entitlements;
 				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 5;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_HARDENED_RUNTIME = YES;
 				INFOPLIST_FILE = SafariKeywordSearchWebExtension/Info.plist;
@@ -507,7 +511,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		08E986C425F3B843002234B3 /* Build configuration list for PBXNativeTarget "SafariKeywordSearch" */ = {
+		08E986C425F3B843002234B3 /* Build configuration list for PBXNativeTarget "Keyword Search" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				08E986C525F3B843002234B3 /* Debug */,
