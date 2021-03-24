@@ -55,10 +55,10 @@ function getSearch(searchParam, andThen) {
         let [first, ...rest] = searchParam.split(/\s+/)
         if (searchData[first]) {
             andThen(searchData[first]
-                .replace('%%%', rest.join('+'))
-                .replace('@@@', escape(rest.join('+')))
-                .replace(/\{\{@(.+?)@\}\}/g, (...m) => escape(rest.join(m[1])))
-                .replace(/\{\{%(.+?)%\}\}/g, (...m) => rest.join(m[1])))
+                .replaceAll('%%%', rest.join('+'))
+                .replaceAll('@@@', escape(rest.join('+')))
+                .replaceAll(/\{\{@(.+?)@\}\}/g, (...m) => escape(rest.join(m[1])))
+                .replaceAll(/\{\{%(.+?)%\}\}/g, (...m) => rest.join(m[1])))
         }
 
     })
