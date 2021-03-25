@@ -64,10 +64,11 @@ function getSearch(searchParam, andThen) {
         }
 
         if (match) {
+            const encodedSearchPhrase = searchPhrase.map(s => encodeURIComponent(s))
             andThen(match
                 .replace('%%%', searchPhrase.join('+'))
-                .replace('@@@', escape(searchPhrase.join('+')))
-                .replace(/\{\{@(.+?)@\}\}/g, (...m) => escape(searchPhrase.join(m[1])))
+                .replace('@@@', encodedSearchPhrase.join('+'))
+                .replace(/\{\{@(.+?)@\}\}/g, (...m) => encodedSearchPhrase.join(m[1]))
                 .replace(/\{\{%(.+?)%\}\}/g, (...m) => searchPhrase.join(m[1])))
         }
 
