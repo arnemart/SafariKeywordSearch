@@ -98,3 +98,7 @@ browser.webNavigation.onBeforeNavigate.addListener(
     beforeNavigate,
     { url: Object.keys(searchDomains).map(domain => ({hostContains: domain})) }
 )       
+
+browser.browserAction.onClicked.addListener(() => {
+    browser.runtime.sendNativeMessage("application.id", "openTheSettingsAppPlease")
+})

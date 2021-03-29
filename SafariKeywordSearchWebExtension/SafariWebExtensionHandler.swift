@@ -18,7 +18,9 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
         let item = context.inputItems[0] as! NSExtensionItem
         let message = item.userInfo?[SFExtensionMessageKey] as? String
         let response = NSExtensionItem()
-        if (message != nil) {
+        if (message != nil && message == "openTheSettingsAppPlease") {
+            NSWorkspace.shared.launchApplication("Keyword Search")
+        } else if (message != nil) {
             let timestamp = TimeInterval(message!)
             if (timestamp != nil && data.changedSince(timestamp: timestamp!)) {
                 response.userInfo = [SFExtensionMessageKey: data.asJsonString()]

@@ -6,5 +6,9 @@
     "extension_description": {
         "message": "Quickly perform keyword searches from the Safari address bar.",
         "description": "Description of what the extension does."
+    },
+    "open_settings": {
+        "message": "Open Keyword Search Settings",
+        "description": "Action button title"
     }
 }
