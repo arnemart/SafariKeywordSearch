@@ -61,7 +61,7 @@ browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
 
 const defaultSearches = {
   version: CURRENT_VERSION,
-  timestamp: Date.now(),
+  timestamp: 0,
   settings: {
     allowedLocations: 'frontOnly'
   },

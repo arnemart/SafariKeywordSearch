@@ -94,7 +94,7 @@ class KeywordSearchData {
         self.jsonData = data
         self.lastSave = getTimestamp(json: data)
         self.userDefaults?.set(data, forKey: self.key)
-        if (!skipIcloud) {
+        if (!skipIcloud && self.lastSave > 0) {
             self.icloudData.set(data, forKey: self.key)
             self.icloudData.synchronize()
         }
