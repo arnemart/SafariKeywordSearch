@@ -202,9 +202,8 @@ function setData(data, andThen) {
     localStorage.setItem('latestFullData', JSON.stringify(latestFullData))
     localStorage.setItem('searchData', JSON.stringify(searchData))
     localStorage.setItem('lastUpdate', lastUpdate)
-
-    if (andThen) andThen()
   }
+  if (andThen) andThen()
 }
 
 function getSearchParam(urlString) {
@@ -273,7 +272,7 @@ function beforeNavigate(details) {
   if (details.parentFrameId == -1 && details.tabId > 0) {
     const now = Date.now()
     if (now - lastInvoked > 500) {
-      if (lastUpdate == 0) {
+      if (lastUpdate == -1) {
         loadData(() => doTheSearch(details))
       } else {
         doTheSearch(details)
