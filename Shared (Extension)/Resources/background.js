@@ -15,7 +15,7 @@ const searchDomains = {
 
 let latestFullData = {}
 let searchData = {}
-let lastUpdate = 0
+let lastUpdate = -1
 
 try {
   // See if we have cached data in local storage, use that until we have loaded data from the app
@@ -146,7 +146,6 @@ function upgradeData(oldData) {
       })
     }
   }
-
   return newData
 }
 

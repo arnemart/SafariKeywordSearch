@@ -13,7 +13,7 @@ struct StoredData: Decodable {
 }
 
 private func nilOrEmpty(s: String?) -> Bool {
-    return s == nil || s == ""
+    return s == nil || s == "" || s == "{}"
 }
 
 private func getTimestamp(json: String) -> Int {
