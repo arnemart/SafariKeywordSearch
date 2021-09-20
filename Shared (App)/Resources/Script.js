@@ -1,5 +1,6 @@
 function show(platform, enabled) {
-    document.body.classList.add(`platform-${platform}`);
+    platform.split(' ').forEach(p => document.body.classList.add(`platform-${p}`));
+    document.body.classList.add('loaded')
 
     if (typeof enabled === "boolean") {
         document.body.classList.toggle(`state-on`, enabled);
@@ -14,4 +15,4 @@ function openPreferences() {
     webkit.messageHandlers.controller.postMessage("open-preferences");
 }
 
-document.querySelector("button.open-preferences").addEventListener("click", openPreferences);
+document.querySelectorAll("button.open-preferences").forEach(e => e.addEventListener("click", openPreferences));

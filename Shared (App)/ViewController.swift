@@ -16,7 +16,7 @@ import SafariServices
 typealias PlatformViewController = NSViewController
 #endif
 
-let extensionBundleIdentifier = "net.aurlien.SafariKeywordSearch.Extension"
+let extensionBundleIdentifier = "net.aurlien.SafariKeywordSearch.SafariKeywordSearchWebExtension"
 
 class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMessageHandler {
 
@@ -27,10 +27,6 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
 
         self.webView.navigationDelegate = self
 
-#if os(iOS)
-        self.webView.scrollView.isScrollEnabled = false
-#endif
-
         self.webView.configuration.userContentController.add(self, name: "controller")
 
         self.webView.loadFileURL(Bundle.main.url(forResource: "Main", withExtension: "html")!, allowingReadAccessTo: Bundle.main.resourceURL!)
@@ -38,7 +34,11 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
 #if os(iOS)
-        webView.evaluateJavaScript("show('ios')")
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            webView.evaluateJavaScript("show('ipad')")
+        } else {
+            webView.evaluateJavaScript("show('ios')")
+        }
 #elseif os(macOS)
         webView.evaluateJavaScript("show('mac')")
 
@@ -56,20 +56,23 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-#if os(macOS)
         if (message.body as! String != "open-preferences") {
             return;
         }
-
+#if os(macOS)
         SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
             guard error == nil else {
                 // Insert code to inform the user that something went wrong.
                 return
             }
-
-            DispatchQueue.main.async {
-                NSApplication.shared.terminate(nil)
-            }
+        }
+#elseif os(iOS)
+        guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
+            return
+        }
+        
+        if UIApplication.shared.canOpenURL(settingsUrl) {
+            UIApplication.shared.open(settingsUrl)
         }
 #endif
     }

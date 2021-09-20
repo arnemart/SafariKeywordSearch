@@ -1,10 +1,14 @@
 {
     "extension_name": {
-        "message": "SafariKeywordSearch",
+        "message": "Keyword Search",
         "description": "The display name for the extension."
     },
     "extension_description": {
-        "message": "This is SafariKeywordSearch. You should tell us what your extension does here.",
+        "message": "Quickly perform keyword searches from the Safari address bar.",
         "description": "Description of what the extension does."
+    },
+    "open_settings": {
+        "message": "Open Keyword Search Settings",
+        "description": "Action button title"
     }
 }

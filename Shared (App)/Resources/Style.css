@@ -1,3 +1,14 @@
+:root {
+    color-scheme: light dark;
+    --box-color: rgba(28, 28, 30, 0.05);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --box-color: rgba(242, 242, 247, 0.2);
+    }
+}
+
 * {
     -webkit-user-select: none;
     -webkit-user-drag: none;
@@ -7,7 +18,7 @@
 :root {
     color-scheme: light dark;
 
-    --spacing: 20px;
+    --spacing: 0.5rem;
 }
 
 html {
@@ -17,31 +28,34 @@ html {
 body {
     display: flex;
     align-items: center;
-    justify-content: center;
     flex-direction: column;
 
     gap: var(--spacing);
-    margin: 0 calc(var(--spacing) * 2);
+    margin: 0 calc(var(--spacing));
     height: 100%;
 
     font: -apple-system-short-body;
     text-align: center;
 }
 
-body:not(.platform-mac, .platform-ios) :is(.platform-mac, .platform-ios) {
+body.platform-mac {
+    justify-content: center;
+}
+
+body .hide {
     display: none;
 }
 
-body.platform-ios .platform-mac {
-    display: none;
+body.platform-ios .platform-ios {
+    display: block;
 }
 
-body.platform-mac .platform-ios {
-    display: none;
+body.platform-mac .platform-mac {
+    display: block;
 }
 
-body.platform-ios .platform-mac {
-    display: none;
+body.platform-ipad .platform-ipad {
+    display: block;
 }
 
 body:not(.state-on, .state-off) :is(.state-on, .state-off) {
@@ -54,6 +68,22 @@ body.state-on :is(.state-off, .state-unknown) {
 
 body.state-off :is(.state-on, .state-unknown) {
     display: none;
+}
+
+img {
+    max-width: 85%;
+    pointer-events: none;
+}
+
+.platform-ipad img {
+    max-width: 50%;
+}
+
+.box {
+    padding: calc(var(--spacing) * 2);
+    margin: var(--spacing);
+    background-color: var(--box-color);
+    border-radius: var(--spacing);
 }
 
 button {

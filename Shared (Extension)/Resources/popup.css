@@ -1,15 +1,286 @@
 :root {
-    color-scheme: light dark;
+  color-scheme: light dark;
+  --border-color: rgba(28, 28, 30, 0.2);
+  --item-background-color: rgba(28, 28, 30, 0.05);
+  --input-background-color: rgba(209, 209, 214, 0.6);
+  --blue: rgb(0, 122, 255);
+  --red: rgb(255, 59, 48);
+  --gray: rgb(174, 174, 178);
 }
 
 body {
-    width: 100px;
-    padding: 10px;
+  margin: 0;
+  font-family: -apple-system;
+}
 
-    font-family: system-ui;
-    text-align: center;
+* {
+  -webkit-user-drag: none;
+  cursor: default !important;
+}
+
+header {
+  font-size: 1.25rem;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 1rem;
 }
 
 @media (prefers-color-scheme: dark) {
-    /* Dark Mode styles go here. */
+  :root {
+    --border-color: rgba(242, 242, 247, 0.2);
+    --item-background-color: rgba(242, 242, 247, 0.2);
+    --input-background-color: rgba(58, 58, 60, 0.6);
+    --blue: rgb(10, 132, 255);
+    --red: rgb(255, 69, 58);
+    --gray: rgb(99, 99, 102);
+  }
+}
+
+.wrap--ios {
+  width: 100vw;
+}
+
+.wrap--mac {
+  width: 23rem;
+  height: 35rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.wrap--ipad {
+  width: 28rem;
+  height: 35rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 1rem;
+  transition: transform 0.3s ease-in, opacity 0.3s ease-in;
+}
+
+.screen.animate-in-left {
+  animation: slide-left 0.3s ease-in forwards;
+  z-index: 101;
+}
+
+.screen.animate-out-left {
+  animation: slide-left 0.3s ease-out reverse forwards;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.screen.animate-in-right {
+  /* animation: slide-right 0.3s ease-in forwards; */
+  transform: translateX(0);
+  opacity: 1;
+  z-index: 101;
+}
+
+.screen.animate-out-right {
+  /* animation: slide-right 0.3s ease-out reverse forwards; */
+  transform: translateX(-100%);
+  opacity: 0;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  pointer-events: none;
+  z-index: 100;
+}
+
+.tiny {
+  opacity: 0.7;
+}
+
+.oneliner {
+  display: block;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+ul {
+  margin-top: 1rem;
+  list-style-type: none;
+  padding: 0;
+  transition: opacity 0.3s ease;
+}
+
+.wrap.has-selected ul {
+  pointer-events: none;
+}
+
+.list__item {
+  position: relative;
+  padding: 1rem;
+  background-color: var(--item-background-color);
+}
+
+.list__item:not(.no-caret) {
+  padding: 1rem 2rem 1rem 1rem;
+}
+
+.list__item:not(.no-caret)::after {
+  display: block;
+  position: absolute;
+  right: 1rem;
+  top: 0;
+  bottom: 0;
+  content: '❯';
+  line-height: 4rem;
+}
+
+.list__item:not(:first-child)::before {
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 1rem;
+  left: 1rem;
+  height: 1px;
+  background-color: var(--border-color);
+  content: '';
+}
+
+.list__item:first-child {
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+.list__item:last-child {
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+input[type='text'],
+input[type='url'] {
+  font-size: inherit;
+  cursor: auto !important;
+  padding: 0.25rem 0.5rem;
+  margin: 0.25rem 0;
+  border-radius: 0.25rem;
+  border: 1px solid var(--border-color);
+  background-color: var(--input-background-color);
+}
+
+.error {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.triangle {
+  display: inline-block;
+  width: 0.7rem;
+  opacity: 0.65;
+  font-size: 1.5rem;
+  line-height: 1rem;
+  position: relative;
+  top: 0.1rem;
+}
+
+.expandor {
+  margin-top: 1rem;
+}
+
+.advanced-settings {
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--item-background-color);
+}
+
+.advanced-settings > label:first-child,
+.list__item > label:first-child {
+  margin-top: 0;
+}
+
+select {
+  color: inherit;
+  font-size: inherit;
+  margin: 0.5rem 0;
+}
+
+.form__buttons {
+  margin-top: 1rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: right;
+}
+
+.form__buttons button {
+  margin-left: 0.5em;
+}
+
+button {
+  color: inherit;
+  appearance: none;
+  border: none;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  background-color: var(--gray);
+  font-size: inherit;
+}
+
+button.primary {
+  color: white;
+  background-color: var(--blue);
+}
+
+button.danger {
+  color: white;
+  background-color: var(--red);
+}
+
+button.go-back {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 1rem;
+  background-color: transparent;
+}
+
+button.go-back:hover {
+  background-color: var(--gray);
+}
+
+button:disabled {
+  opacity: 0.5;
+}
+
+@keyframes slide-right {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-left {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
