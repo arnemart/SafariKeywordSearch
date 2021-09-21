@@ -2,9 +2,7 @@
 
 <http://safarikeywordsearch.aurlien.net>
 
-[Download on the Mac App Store](https://apps.apple.com/app/keyword-search/id1558453954)
-
-_insert iOS App Store link here when app review is done_
+[Download on the App Store](https://apps.apple.com/app/keyword-search/id1558453954)
 
 Safari Keyword Search is a simple extension for Safari on macOS amd iOS that enables keyword searching from the address bar. This is a simple but powerful feature that gives you access to several search engines using simple keywords. For example, you can search Wikipedia for information on monkeys by typing **w monkeys** in the address bar.
 
