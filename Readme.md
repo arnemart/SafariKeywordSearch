@@ -26,6 +26,16 @@ You can also add your own searches in the extension settings, which live inside 
 
 If you want to contribute a PR, feel free. Let me warn you, the source code is a lot like a garbage fire at a spaghetti factory.
 
+### Did the extension disappear from Safari on macOS?
+
+There is a bug in Safari on macOS where extensions sometimes disappear. To fix it, quit Safari then copy this command and run it in the Terminal:
+
+```
+/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R /Applications/Safari.app
+```
+
+[Thanks to Jeff Johnson for figuring that out!](https://lapcatsoftware.com/articles/disappearing-safari.html)
+
 ### Weird details/limitations etc
 
 This is how the extension works:
