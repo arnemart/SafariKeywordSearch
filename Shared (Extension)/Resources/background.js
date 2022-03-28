@@ -219,7 +219,7 @@ function getSearchParam(urlString) {
 }
 
 function getSearchUrl(searchParam) {
-  let parts = searchParam.split(/\s+/)
+  let parts = searchParam.split(/\s+|\//)
   let match = searchData[parts[0]]
   let searchPhrase = parts.slice(1)
 
