@@ -28,13 +28,24 @@ If you want to contribute a PR, feel free. Let me warn you, the source code is a
 
 ### Did the extension disappear from Safari on macOS?
 
-There is a bug in Safari on macOS where extensions sometimes disappear. To fix it, quit Safari then copy this command and run it in the Terminal:
+There is a bug in Safari on macOS where extensions sometimes disappear. To fix it, do the following:
 
+1. Quit Safari
+2. Copy this command and run it in the Terminal:
 ```
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f -R /Applications/Safari.app
 ```
+3. Launch Safari again.
+4. In Safari open: Preferences > Extensions:
+a) SafariKeywordSearch should show up in the listing.
+b) Re-activate the checkbox!
 
-[Thanks to Jeff Johnson for figuring that out!](https://lapcatsoftware.com/articles/disappearing-safari.html)
+From then on searching should work again, and the SafariKeywordSearch button in the address bar should appear again (if you chose it that way).
+
+Thanks to:
+- [Jeff Johnson for figuring that out!](https://lapcatsoftware.com/articles/disappearing-safari.html)
+- [@porg](https://github.com/porg) for adding the distinctive step 4 to the instruction.
+
 
 ### Weird details/limitations etc
 
