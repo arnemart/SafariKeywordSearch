@@ -52,3 +52,17 @@ Parsing the URL to get the search string is not optimal, but it’s the only way
 - If you have more than one keyword the extension can in rare cases trigger multiple times (i.e. if you enter ddg g w monkey) (there are workarounds for this in place but it can happen anyway).
 
 The previous previous Safari Extension API had a beforeSearch event that was a lot more convenient. To any Safari developers who might be reading this: hello!
+
+### How to search with special characters
+
+**Problem:** Search your desired search engine with a query containing special characters (such as Umlauts, diacrits, Cyrillic, Arabic, etc). Example: I enter "wd Österreich" plus ENTER. So the prefix "wd" for my search engine "Wikipedia Deutsch" (German) and I expect to get to `https://de.wikipedia.org/wiki/Österreich` but instead I get to my default search engine `https://duckduckgo.com/?q=wd+%C3%96sterreich&ia=web`.
+
+**Solution**:
+1. Open Safari Keyword Search.
+2. Open or create your entry.
+3. Open "Advanced Settings".
+4. Activate the option "URL escape". This makes sure your special characters.
+5. Save your search engine.
+
+- ✅ From now on it should work.
+- ℹ️ Note: Results may vary between search engines (depending how the treat parameter input in regards to escaping and encoding.)
