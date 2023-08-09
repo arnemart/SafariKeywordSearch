@@ -1,16 +1,16 @@
 const CURRENT_VERSION = 3
 
-const searchDomains = {
-  'search.yahoo.com': 'p',
-  'www.search.yahoo.com': 'p',
-  'google.com': 'q',
-  'www.google.com': 'q',
-  'duckduckgo.com': 'q',
-  'www.duckduckgo.com': 'q',
-  'bing.com': 'q',
-  'www.bing.com': 'q',
-  'ecosia.org': 'q',
-  'www.ecosia.org': 'q'
+const searchDomainRegex = /^(www\.)?(search\.yahoo|google|duckduckgo|bing|ecosia|baidu|soguo|so)(\.[a-z]{2,}){1,2}$/
+
+const searchEngineParameters = {
+  'search.yahoo': 'p',
+  google: 'q',
+  duckduckgo: 'q',
+  bing: 'q',
+  ecosia: 'q',
+  baidu: 'word',
+  soguo: 'keyword',
+  so: 'q'
 }
 
 let latestFullData = {}
@@ -32,15 +32,9 @@ try {
   }
 } catch (e) {}
 
-const urlFilter = Object.keys(searchDomains).map(domain => ({ hostContains: domain }))
+browser.webNavigation.onBeforeNavigate.addListener(beforeNavigate)
 
-browser.webNavigation.onBeforeNavigate.addListener(beforeNavigate, {
-  url: urlFilter
-})
-
-browser.webNavigation.onCommitted.addListener(onCommitted, {
-  url: urlFilter
-})
+browser.webNavigation.onCommitted.addListener(onCommitted)
 
 browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   switch (request.message) {
@@ -208,10 +202,10 @@ function setData(data, andThen) {
 
 function getSearchParam(urlString) {
   const url = new URL(urlString)
-  const host = url.host
-  if (host in searchDomains) {
+  const matches = url.host.match(searchDomainRegex)
+  if (matches) {
     const urlParams = new URLSearchParams(url.search)
-    const searchParam = urlParams.get(searchDomains[host])
+    const searchParam = urlParams.get(searchEngineParameters[matches[2]])
     if (searchParam) {
       return searchParam
     }
