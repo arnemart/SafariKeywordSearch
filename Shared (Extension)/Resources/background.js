@@ -36,6 +36,21 @@ browser.webNavigation.onBeforeNavigate.addListener(beforeNavigate)
 
 browser.webNavigation.onCommitted.addListener(onCommitted)
 
+function validateData(json) {
+  try {
+    return (
+      typeof json.version == 'number' &&
+      json.searches instanceof Array &&
+      json.settings instanceof Object &&
+      json.searches.every(
+        s => typeof s.name == 'string' && typeof s.keywords == 'string' && typeof s.expansion == 'string'
+      )
+    )
+  } catch (e) {
+    return false
+  }
+}
+
 browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   switch (request.message) {
     case 'popupWantsData': {
@@ -49,6 +64,35 @@ browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
         searches: request.data.searches,
         settings: request.data.settings
       })
+      break
+    }
+    case 'popupWantsToImport': {
+      try {
+        const json = JSON.parse(request.data)
+        json.timestamp = Date.now()
+        if (validateData(json)) {
+          if (json.version && json.version == CURRENT_VERSION) {
+            setData(json, () => sendResponse({ success: true }))
+          } else if (json.version && json.version < CURRENT_VERSION) {
+            const upgradedData = upgradeData(json)
+            saveData(upgradedData, () => sendResponse({ success: true }))
+          }
+        } else {
+          console.log('Error importing search data:', e, request.data)
+          sendResponse({ success: false })
+        }
+      } catch (e) {
+        sendResponse({ success: false })
+        console.log('Error importing search data:', e, request.data)
+      }
+      break
+    }
+    case 'popupWantsToReset': {
+      saveData({
+        ...defaultSearches,
+        timestamp: Date.now()
+      })
+      break
     }
   }
 })

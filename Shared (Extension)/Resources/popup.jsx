@@ -5,6 +5,7 @@ import Editor from './Editor'
 const main = document.querySelector('main')
 
 let tries = 0
+let key = Math.random()
 
 const osPromise = browser.runtime.getPlatformInfo()
 const loadData = () => {
@@ -36,6 +37,35 @@ function saveData(data) {
   })
 }
 
+function importData(data) {
+  return browser.runtime.sendMessage({
+    message: 'popupWantsToImport',
+    data: data
+  })
+}
+
+function reload() {
+  key = Math.random()
+  loadData()
+}
+
+function resetData() {
+  browser.runtime.sendMessage({
+    message: 'popupWantsToReset'
+  })
+}
+
 function letsGo(data, os) {
-  ReactDOM.render(<Editor data={data} save={saveData} os={os} />, main)
+  ReactDOM.render(
+    <Editor
+      key={key}
+      data={data}
+      save={saveData}
+      importData={importData}
+      reload={reload}
+      resetData={resetData}
+      os={os}
+    />,
+    main
+  )
 }

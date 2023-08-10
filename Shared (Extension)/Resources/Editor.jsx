@@ -54,6 +54,15 @@ const Editor = props => {
     setSelected(0)
   }
 
+  const exportData = () => {
+    const dataToExport = {
+      searches: props.data.searches,
+      settings: props.data.settings,
+      version: props.data.version
+    }
+    navigator.clipboard.writeText(JSON.stringify(dataToExport))
+  }
+
   const listAnimationName =
     selected > -1 ? 'animate-out-right' : prevSelected > -1 ? 'animate-in-right' : 'animate-none'
 
@@ -62,7 +71,14 @@ const Editor = props => {
       <div className="contents">
         <Screen key="list" animate={listAnimationName} ref={listRef}>
           <List searches={searches} expandMe={expandMe} createNew={createNew} os={props.os} />
-          <Settings settings={props.data.settings} save={saveSettings} />
+          <Settings
+            settings={props.data.settings}
+            save={saveSettings}
+            exportData={exportData}
+            importData={props.importData}
+            reload={props.reload}
+            resetData={props.resetData}
+          />
         </Screen>
         {selected > -1 && (
           <Screen key={`editor-{selected}`} animate="animate-in-left">
@@ -107,28 +123,96 @@ const List = ({ searches, expandMe, createNew, os }) => (
   </>
 )
 
-const Settings = ({ settings, save }) => (
-  <>
-    <header>Other settings</header>
-    <ul>
-      <li className="list__item no-caret">
-        <FormFieldWithHelpTextEtc
-          name="allowedLocations"
-          label="Allowed keyword locations"
-          helpText="Do you want to be able to type the keyword after the search phrase? This setting can be overridden for each keyword."
-          type="select"
-          options={[
-            { name: 'Front only', value: 'frontOnly' },
-            { name: 'Front and end', value: 'frontAndEnd' }
-          ]}
-          vals={settings}
-          update={(key, val) => save({ [key]: val })}
-          errors={{}}
-        />
-      </li>
-    </ul>
-  </>
-)
+const Settings = ({ settings, save, exportData, importData, reload, resetData }) => {
+  const importText = useRef(null)
+  const importButtonRef = useRef(null)
+  const [importing, setImporting] = useState(false)
+  const [importError, setImportError] = useState(false)
+  const [resetting, setResetting] = useState(false)
+
+  function doImport() {
+    setImportError(false)
+    setResetting(false)
+    if (importing) {
+      importData(importText.current.value).then(result => {
+        if (result.success) {
+          reload()
+          window.scrollTo(0, 0)
+        } else {
+          setImporting(false)
+          setImportError(true)
+        }
+      })
+    } else {
+      setImporting(true)
+      setTimeout(() => {
+        try {
+          importButtonRef.current.scrollIntoView()
+        } catch (e) {}
+      }, 300)
+    }
+  }
+
+  function doReset() {
+    setImporting(false)
+    if (resetting) {
+      setResetting(false)
+      resetData()
+      reload()
+      window.scrollTo(0, 0)
+    } else {
+      setResetting(true)
+    }
+  }
+
+  return (
+    <>
+      <header>Other settings</header>
+      <ul>
+        <li className="list__item no-caret">
+          <FormFieldWithHelpTextEtc
+            name="allowedLocations"
+            label="Allowed keyword locations"
+            helpText="Do you want to be able to type the keyword after the search phrase? This setting can be overridden for each keyword."
+            type="select"
+            options={[
+              { name: 'Front only', value: 'frontOnly' },
+              { name: 'Front and end', value: 'frontAndEnd' }
+            ]}
+            vals={settings}
+            update={(key, val) => save({ [key]: val })}
+            errors={{}}
+          />
+        </li>
+      </ul>
+
+      <header>Export/Import</header>
+      <ul>
+        <li className="list__item no-caret">
+          <button type="button" onClick={exportData}>
+            Export data to clipboard
+          </button>
+        </li>
+        <li className="list__item no-caret">
+          <textarea placeholder="Paste your data here and click “Import”" ref={importText}></textarea>
+          {importError && (
+            <div className="error">
+              <small>There was an error importing the data. Is the syntax correct?</small>
+            </div>
+          )}
+          <button type="button" onClick={doImport} className={importing ? 'danger' : ''}>
+            {importing ? 'Confirm import – this will overwrite your existing data' : 'Import'}
+          </button>
+        </li>
+        <li className="list__item no-caret">
+          <button type="button" onClick={doReset} className={resetting ? 'danger' : ''} ref={importButtonRef}>
+            {resetting ? 'Confirm restore – this will overwrite your existing data' : 'Restore default searches'}
+          </button>
+        </li>
+      </ul>
+    </>
+  )
+}
 
 const JustOne = ({ search, expand }) => {
   return (
