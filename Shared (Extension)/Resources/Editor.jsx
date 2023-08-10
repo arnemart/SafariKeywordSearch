@@ -320,8 +320,11 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
           name="expansion"
           label="Expansion"
           helpText="Insert @@@ in the URL where you want the search terms to appear."
-          type="url"
           more={{
+            inputmode: 'url',
+            autocorrect: 'off',
+            autocapitalize: 'none',
+            spellcheck: false,
             placeholder: 'https://example.com?search=@@@'
           }}
           vals={vals}
