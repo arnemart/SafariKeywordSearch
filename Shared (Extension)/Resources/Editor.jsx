@@ -293,6 +293,9 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
         ❮
       </button>
       <form onSubmit={handleSubmit}>
+        <button type="submit" className="primary top-right" disabled={!valid}>
+          Save
+        </button>
         <FormFieldWithHelpTextEtc
           name="name"
           label="Name"
