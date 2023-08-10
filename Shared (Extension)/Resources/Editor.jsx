@@ -229,6 +229,7 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
     keywords: search.keywords,
     expansion: search.expansion,
     escape: search.escape !== false,
+    spaceReplacer: search.spaceReplacer || '',
     allowedLocations: search.allowedLocations || 'default'
   })
   const [changed, setChanged] = useState(false)
