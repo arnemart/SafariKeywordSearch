@@ -38,9 +38,7 @@ There is a bug in Safari on macOS where extensions sometimes disappear. To fix i
 3. Relaunch Safari
 4. Go to Safari Preferences --> Extensions, Keyword Search should have reappeared. If the checkbox is unchecked, check it to reenable the extension.
 
-Thanks to: 
-- [Jeff Johnson for figuring that out!](https://lapcatsoftware.com/articles/disappearing-safari.html)
-- [@porg](https://github.com/porg) for helping clarify these instructions
+Thanks to [Jeff Johnson for figuring that out](https://lapcatsoftware.com/articles/disappearing-safari.html) and [@porg](https://github.com/porg) for helping clarify these instructions.
 
 ### Weird details/limitations etc
 
