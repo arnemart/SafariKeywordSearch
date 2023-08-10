@@ -259,6 +259,12 @@ button.go-back {
   background-color: transparent;
 }
 
+button.top-right {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+}
+
 button.go-back:hover {
   background-color: var(--gray);
 }
