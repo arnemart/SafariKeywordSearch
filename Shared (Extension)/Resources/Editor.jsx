@@ -259,7 +259,8 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
     setChanged(true)
   }
 
-  const valid = search.new ? changed : Object.values(errors).every(v => v == '')
+  const fieldsValid = Object.values(errors).every(v => v == '')
+  const valid = search.new ? changed && fieldsValid : fieldsValid
 
   const cancel = search.new ? deleteOne : collapse
 
