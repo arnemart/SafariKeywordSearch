@@ -13,8 +13,8 @@
 		081CB0E92670DD6E00FC25F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 081CB0E72670DD6E00FC25F0 /* Main.storyboard */; };
 		081CB0F22670DD6E00FC25F0 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 081CB0F12670DD6E00FC25F0 /* AppDelegate.swift */; };
 		081CB0F52670DD6E00FC25F0 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 081CB0F32670DD6E00FC25F0 /* Main.storyboard */; };
-		081CB0FC2670DD6E00FC25F0 /* SafariKeywordSearch Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 081CB0FB2670DD6E00FC25F0 /* SafariKeywordSearch Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		081CB1062670DD6E00FC25F0 /* Keyword Search Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 081CB1052670DD6E00FC25F0 /* Keyword Search Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		081CB0FC2670DD6E00FC25F0 /* SafariKeywordSearch Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 081CB0FB2670DD6E00FC25F0 /* SafariKeywordSearch Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		081CB1062670DD6E00FC25F0 /* Keyword Search Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 081CB1052670DD6E00FC25F0 /* Keyword Search Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		081CB10B2670DD6E00FC25F0 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 081CB0C72670DD6B00FC25F0 /* Main.html */; };
 		081CB10C2670DD6E00FC25F0 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = 081CB0C72670DD6B00FC25F0 /* Main.html */; };
 		081CB10F2670DD6E00FC25F0 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = 081CB0CA2670DD6B00FC25F0 /* Style.css */; };
@@ -46,7 +46,6 @@
 		085B94E626763ACB00C0950C /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 085B94E42676399E00C0950C /* manifest.json */; };
 		087E031426EB4EB0003DB5BD /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 087E031326EB4EB0003DB5BD /* Icon.png */; };
 		087E031526EB4EB0003DB5BD /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 087E031326EB4EB0003DB5BD /* Icon.png */; };
-		08BA01DD26EB8A94007CBC50 /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 08BA01DC26EB8A94007CBC50 /* Info.plist */; };
 		08EA0BB126F87290005529DD /* ios-enable.png in Resources */ = {isa = PBXBuildFile; fileRef = 08EA0BAD26F8728F005529DD /* ios-enable.png */; };
 		08EA0BB426F87631005529DD /* ios-settings.png in Resources */ = {isa = PBXBuildFile; fileRef = 08EA0BB326F87631005529DD /* ios-settings.png */; };
 		08EA0BB926F88CFA005529DD /* ipad-enable.png in Resources */ = {isa = PBXBuildFile; fileRef = 08EA0BB526F88CF9005529DD /* ipad-enable.png */; };
@@ -75,26 +74,26 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		081CB12E2670DD6E00FC25F0 /* Embed App Extensions */ = {
+		081CB12E2670DD6E00FC25F0 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				081CB0FC2670DD6E00FC25F0 /* SafariKeywordSearch Extension.appex in Embed App Extensions */,
+				081CB0FC2670DD6E00FC25F0 /* SafariKeywordSearch Extension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		081CB1352670DD6E00FC25F0 /* Embed App Extensions */ = {
+		081CB1352670DD6E00FC25F0 /* Embed Foundation Extensions */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				081CB1062670DD6E00FC25F0 /* Keyword Search Extension.appex in Embed App Extensions */,
+				081CB1062670DD6E00FC25F0 /* Keyword Search Extension.appex in Embed Foundation Extensions */,
 			);
-			name = "Embed App Extensions";
+			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -331,7 +330,7 @@
 				081CB0D92670DD6E00FC25F0 /* Sources */,
 				081CB0DA2670DD6E00FC25F0 /* Frameworks */,
 				081CB0DB2670DD6E00FC25F0 /* Resources */,
-				081CB12E2670DD6E00FC25F0 /* Embed App Extensions */,
+				081CB12E2670DD6E00FC25F0 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -350,7 +349,7 @@
 				081CB0EB2670DD6E00FC25F0 /* Sources */,
 				081CB0EC2670DD6E00FC25F0 /* Frameworks */,
 				081CB0ED2670DD6E00FC25F0 /* Resources */,
-				081CB1352670DD6E00FC25F0 /* Embed App Extensions */,
+				081CB1352670DD6E00FC25F0 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
@@ -406,7 +405,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1300;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1430;
 				TargetAttributes = {
 					081CB0DC2670DD6E00FC25F0 = {
 						CreatedOnToolsVersion = 13.0;
@@ -472,7 +471,6 @@
 			files = (
 				087E031526EB4EB0003DB5BD /* Icon.png in Resources */,
 				081CB1102670DD6E00FC25F0 /* Style.css in Resources */,
-				08BA01DD26EB8A94007CBC50 /* Info.plist in Resources */,
 				081CB0F52670DD6E00FC25F0 /* Main.storyboard in Resources */,
 				081CB1122670DD6E00FC25F0 /* Script.js in Resources */,
 				081CB1162670DD6E00FC25F0 /* Assets.xcassets in Resources */,
@@ -672,6 +670,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
@@ -734,6 +733,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -899,6 +899,7 @@
 				CODE_SIGN_ENTITLEMENTS = "SafariKeywordSearch Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 16;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -929,6 +930,7 @@
 				CODE_SIGN_ENTITLEMENTS = "SafariKeywordSearch Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 16;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -962,6 +964,7 @@
 				CODE_SIGN_ENTITLEMENTS = "macOS (App)/SafariKeywordSearch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 16;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -1002,6 +1005,7 @@
 				CODE_SIGN_ENTITLEMENTS = "macOS (App)/SafariKeywordSearch.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 16;
+				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_TEAM = 5YSSE2V8P3;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
