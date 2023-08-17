@@ -242,7 +242,7 @@ function setData(data, andThen) {
         foundDefault = true
       }
       for (const k of s.keywords.split(/\s*,\s*/)) {
-        searchData[k] = s
+        searchData[k.toLowerCase()] = s
       }
     }
     if (!foundDefault) {
@@ -270,11 +270,11 @@ function getSearchParam(urlString) {
 
 function getSearchUrl(searchParam) {
   let parts = searchParam.split(/\s+/)
-  let match = searchData[parts[0]]
+  let match = searchData[parts[0].toLowerCase()]
   let searchPhrase = parts.slice(1)
 
   if (!match && parts.length > 1) {
-    const tentativeMatch = searchData[parts[parts.length - 1]]
+    const tentativeMatch = searchData[parts[parts.length - 1].toLowerCase()]
     if (
       (tentativeMatch && tentativeMatch.allowedLocations == 'frontAndEnd') ||
       latestFullData.settings.allowedLocations == 'frontAndEnd'
