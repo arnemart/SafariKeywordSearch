@@ -470,10 +470,13 @@ const JustTheHeader = ({ search }) => (
   <>
     {search.name ? (
       <>
+        {search.isDefault && <strong>Default: </strong>}
         {search.name} - <small>{search.keywords}</small>
       </>
     ) : (
-      search.keywords
+      <>
+        {search.isDefault && <strong>Default: </strong>} {search.keywords}
+      </>
     )}
   </>
 )
