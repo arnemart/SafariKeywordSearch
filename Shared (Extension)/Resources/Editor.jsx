@@ -23,6 +23,13 @@ const Editor = props => {
       deleteOne(i)()
     } else {
       searches[i] = s
+      if (searches[i].isDefault) {
+        for (let j = 0; j < searches.length; j++) {
+          if (j != i) {
+            delete searches[j].isDefault
+          }
+        }
+      }
       setSearches(searches)
       setPrevSelected(selected)
       setSelected(-1)
@@ -228,6 +235,7 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
     name: search.name,
     keywords: search.keywords,
     expansion: search.expansion,
+    isDefault: search.isDefault || false,
     escape: search.escape !== false,
     spaceReplacer: search.spaceReplacer || '',
     allowedLocations: search.allowedLocations || 'default'
@@ -332,6 +340,15 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
           update={update}
           errors={errors}
           showError={touched.expansion || showAllErrors}
+        />
+        <FormFieldWithHelpTextEtc
+          name="isDefault"
+          label="Make default"
+          helpText="Do you want to make this the default search engine when you search without a keyword?"
+          type="checkbox"
+          vals={vals}
+          update={update}
+          errors={errors}
         />
 
         <div>

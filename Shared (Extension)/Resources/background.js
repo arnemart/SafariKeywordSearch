@@ -15,6 +15,7 @@ const searchEngineParameters = {
 
 let latestFullData = {}
 let searchData = {}
+let defaultSearch = null
 let lastUpdate = -1
 
 try {
@@ -26,6 +27,8 @@ try {
       latestFullData = parsedFullData
       const cachedData = localStorage.getItem('searchData')
       if (cachedData) searchData = JSON.parse(cachedData)
+      const cachedDefaultSearch = localStorage.getItem('defaultSearch')
+      if (cachedDefaultSearch) defaultSearch = JSON.parse(cachedDefaultSearch)
       const cachedLastUpdate = localStorage.getItem('lastUpdate')
       if (cachedLastUpdate) lastUpdate = parseInt(cachedLastUpdate, 10)
     }
@@ -232,13 +235,22 @@ function setData(data, andThen) {
     latestFullData = data
     lastUpdate = data.timestamp
     searchData = {}
+    let foundDefault = false
     for (const s of data.searches) {
+      if (s.isDefault) {
+        defaultSearch = s
+        foundDefault = true
+      }
       for (const k of s.keywords.split(/\s*,\s*/)) {
         searchData[k] = s
       }
     }
+    if (!foundDefault) {
+      defaultSearch = null
+    }
     localStorage.setItem('latestFullData', JSON.stringify(latestFullData))
     localStorage.setItem('searchData', JSON.stringify(searchData))
+    localStorage.setItem('defaultSearch', JSON.stringify(defaultSearch))
     localStorage.setItem('lastUpdate', lastUpdate)
   }
   if (andThen) andThen()
@@ -270,6 +282,11 @@ function getSearchUrl(searchParam) {
       match = tentativeMatch
       searchPhrase = parts.slice(0, -1)
     }
+  }
+
+  if (!match && defaultSearch) {
+    match = defaultSearch
+    searchPhrase = parts
   }
 
   if (match) {
