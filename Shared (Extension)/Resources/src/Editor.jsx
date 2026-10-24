@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { ensureIds } from './data.js'
 
 const keywordRegex = /\S+/
 const urlRegex = /^https?:\/\/.+/
 
-const emptySearch = () => ({ name: '', keywords: '', expansion: '', new: true })
+const emptySearch = () => ({ id: crypto.randomUUID(), name: '', keywords: '', expansion: '', new: true })
+
+const sortKey = s => (s.name || s.keywords).toLowerCase()
+const bySortKey = (a, b) => (sortKey(a) < sortKey(b) ? -1 : 1)
 
 const Screen = React.forwardRef(({ animate, children }, ref) => (
   <div className={`screen ${animate}`} ref={ref}>
@@ -12,72 +16,85 @@ const Screen = React.forwardRef(({ animate, children }, ref) => (
 ))
 
 const Editor = props => {
-  const [searches, setSearches] = useState(props.data.searches)
+  const [searches, setSearches] = useState(() => ensureIds(props.data.searches))
   const [settings, setSettings] = useState(props.data.settings)
-  const [selected, setSelected] = useState(-1)
-  const [prevSelected, setPrevSelected] = useState(-1)
+  const [selectedId, setSelectedId] = useState(null)
+  const [prevSelectedId, setPrevSelectedId] = useState(null)
   const listRef = useRef(null)
-  const [recentlyDeleted, setRecentlyDeleted] = useState(emptySearch())
+  const [recentlyDeleted, setRecentlyDeleted] = useState(null)
 
-  const saveOne = i => s => {
-    if (!keywordRegex.test(s.keywords) || !urlRegex.test(s.expansion)) {
-      deleteOne(i)()
-    } else {
-      searches[i] = s
-      if (searches[i].isDefault) {
-        for (let j = 0; j < searches.length; j++) {
-          if (j != i) {
-            delete searches[j].isDefault
-          }
-        }
-      }
-      setSearches(searches)
-      setPrevSelected(selected)
-      setSelected(-1)
-      props.save({ searches: searches, settings: settings })
+  // Unsaved new searches are never persisted
+  const persist = (newSearches, newSettings) =>
+    props.save({ searches: newSearches.filter(s => !s.new), settings: newSettings })
+
+  const select = id => {
+    setPrevSelectedId(selectedId)
+    setSelectedId(id)
+  }
+
+  const saveOne = id => vals => {
+    if (!keywordRegex.test(vals.keywords) || !urlRegex.test(vals.expansion)) {
+      deleteOne(id)()
+      return
     }
+    const newSearches = searches.map(s => {
+      if (s.id === id) {
+        const { new: _, ...rest } = { ...s, ...vals }
+        return rest
+      }
+      if (vals.isDefault && s.isDefault) {
+        const { isDefault: _, ...rest } = s
+        return rest
+      }
+      return s
+    })
+    setSearches(newSearches)
+    select(null)
+    persist(newSearches, settings)
   }
 
   const saveSettings = changes => {
     const newSettings = { ...settings, ...changes }
     setSettings(newSettings)
-    props.save({ searches: searches, settings: newSettings })
+    persist(searches, newSettings)
   }
 
-  const deleteOne = i => () => {
-    const [deleted] = searches.splice(i, 1)
-    setRecentlyDeleted(deleted)
-    setSearches(searches)
-    setPrevSelected(selected)
-    setSelected(-1)
-    props.save({ searches: searches, settings: settings })
+  const deleteOne = id => () => {
+    setRecentlyDeleted(searches.find(s => s.id === id))
+    const newSearches = searches.filter(s => s.id !== id)
+    setSearches(newSearches)
+    select(null)
+    persist(newSearches, settings)
   }
 
-  const expandMe = i => () => {
+  const expandMe = id => () => {
     setRecentlyDeleted(null)
-    setPrevSelected(selected)
-    setSelected(i)
+    select(id)
   }
 
   const createNew = () => {
-    setSearches([emptySearch(), ...searches])
-    setSelected(0)
+    const search = emptySearch()
+    setSearches([search, ...searches])
+    setRecentlyDeleted(null)
+    select(search.id)
   }
 
   const exportData = () => {
     const dataToExport = {
-      searches: searches,
+      searches: searches.filter(s => !s.new),
       settings: settings,
       version: props.data.version
     }
     navigator.clipboard.writeText(JSON.stringify(dataToExport))
   }
 
-  const listAnimationName =
-    selected > -1 ? 'animate-out-right' : prevSelected > -1 ? 'animate-in-right' : 'animate-none'
+  const selected = selectedId !== null && searches.find(s => s.id === selectedId)
+  const prevSelected = recentlyDeleted || (prevSelectedId !== null && searches.find(s => s.id === prevSelectedId))
+
+  const listAnimationName = selected ? 'animate-out-right' : prevSelectedId ? 'animate-in-right' : 'animate-none'
 
   return (
-    <div className={`wrap wrap--${props.os} ${selected > -1 && 'has-selected'}`}>
+    <div className={`wrap wrap--${props.os} ${selected ? 'has-selected' : ''}`}>
       <div className="contents">
         <Screen key="list" animate={listAnimationName} ref={listRef}>
           <List searches={searches} expandMe={expandMe} createNew={createNew} os={props.os} />
@@ -90,24 +107,19 @@ const Editor = props => {
             resetData={props.resetData}
           />
         </Screen>
-        {selected > -1 && (
-          <Screen key={`editor-${selected}`} animate="animate-in-left">
+        {selected && (
+          <Screen key={`editor-${selected.id}`} animate="animate-in-left">
             <EditIt
-              search={searches[selected]}
-              save={saveOne(selected)}
-              deleteOne={deleteOne(selected)}
-              collapse={expandMe(-1)}
+              search={selected}
+              save={saveOne(selected.id)}
+              deleteOne={deleteOne(selected.id)}
+              collapse={expandMe(null)}
             />
           </Screen>
         )}
-        {selected == -1 && prevSelected > -1 && (
-          <Screen key={`editor-${prevSelected}`} animate="animate-out-left">
-            <EditIt
-              search={recentlyDeleted || searches[prevSelected]}
-              save={() => {}}
-              deleteOne={() => {}}
-              collapse={() => {}}
-            />
+        {!selected && prevSelected && (
+          <Screen key={`editor-${prevSelected.id}`} animate="animate-out-left">
+            <EditIt search={prevSelected} save={() => {}} deleteOne={() => {}} collapse={() => {}} />
           </Screen>
         )}
       </div>
@@ -125,9 +137,10 @@ const List = ({ searches, expandMe, createNew, os }) => (
     </button>
     <ul>
       {searches
-        .sort((a, b) => ((a.name || a.keywords).toLowerCase() < (b.name || b.keywords).toLowerCase() ? -1 : 1))
-        .map((s, i) => (
-          <JustOne key={i} search={s} expand={expandMe(i)} />
+        .filter(s => !s.new)
+        .sort(bySortKey)
+        .map(s => (
+          <JustOne key={s.id} search={s} expand={expandMe(s.id)} />
         ))}
     </ul>
   </>

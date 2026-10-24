@@ -525,7 +525,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Xcode does not get the shell PATH, so look up fnm/Homebrew node ourselves\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\nif command -v fnm >/dev/null 2>&1; then eval \"$(fnm env)\"; fi\nif ! command -v npm >/dev/null 2>&1; then\n  echo \"warning: npm not found, using committed popup.js\"\n  exit 0\nfi\ncd \"Shared (Extension)/Resources\"\n[ -d node_modules ] || npm ci\nnpm run build\n";
+			shellScript = "# Xcode does not get the shell PATH, so look up fnm/Homebrew node ourselves\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\nif command -v fnm >/dev/null 2>&1; then eval \"$(fnm env)\"; fi\nif ! command -v npm >/dev/null 2>&1; then\n  echo \"error: npm not found, needed to build popup.js and background.js\"\n  exit 1\nfi\ncd \"Shared (Extension)/Resources\"\n[ -d node_modules ] || npm ci\nnpm run build\n";
 		};
 		085B94E1267245C900C0950C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -543,7 +543,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Xcode does not get the shell PATH, so look up fnm/Homebrew node ourselves\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\nif command -v fnm >/dev/null 2>&1; then eval \"$(fnm env)\"; fi\nif ! command -v npm >/dev/null 2>&1; then\n  echo \"warning: npm not found, using committed popup.js\"\n  exit 0\nfi\ncd \"Shared (Extension)/Resources\"\n[ -d node_modules ] || npm ci\nnpm run build\n";
+			shellScript = "# Xcode does not get the shell PATH, so look up fnm/Homebrew node ourselves\nexport PATH=\"/opt/homebrew/bin:/usr/local/bin:$PATH\"\nif command -v fnm >/dev/null 2>&1; then eval \"$(fnm env)\"; fi\nif ! command -v npm >/dev/null 2>&1; then\n  echo \"error: npm not found, needed to build popup.js and background.js\"\n  exit 1\nfi\ncd \"Shared (Extension)/Resources\"\n[ -d node_modules ] || npm ci\nnpm run build\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 

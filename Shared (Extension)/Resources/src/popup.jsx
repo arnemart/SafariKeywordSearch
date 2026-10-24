@@ -1,8 +1,7 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import Editor from './Editor'
+import { createRoot } from 'react-dom/client'
+import Editor from './Editor.jsx'
 
-const main = document.querySelector('main')
+const root = createRoot(document.querySelector('main'))
 
 let tries = 0
 let key = Math.random()
@@ -56,7 +55,7 @@ function resetData() {
 }
 
 function letsGo(data, os) {
-  ReactDOM.render(
+  root.render(
     <Editor
       key={key}
       data={data}
@@ -65,7 +64,6 @@ function letsGo(data, os) {
       reload={reload}
       resetData={resetData}
       os={os}
-    />,
-    main
+    />
   )
 }

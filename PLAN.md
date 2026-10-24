@@ -23,14 +23,24 @@ Minimum: Safari 17 (iOS 17, macOS 12+ with Safari 17). The Safari permission pro
 - Build
   - Removed `dist/` and source maps from git; `npm run build` without source maps. `popup.js` stays committed until step 2 (Xcode references it directly).
   - Deployment target macOS 11 → 12 (Xcode no longer supports 11), iOS 15 → 17.
-  - Xcode's "recommended settings" applied (Xcode 27). Run Script phase (`npm run build`) finds node via fnm/Homebrew (Xcode does not get the shell PATH), runs `npm ci` if needed, warns instead of failing without npm. `ENABLE_USER_SCRIPT_SANDBOXING = NO` on the extension targets, because the script writes `popup.js` to the source folder.
+  - Xcode's "recommended settings" applied (Xcode 27). Run Script phase (`npm run build`) finds node via fnm/Homebrew (Xcode does not get the shell PATH), runs `npm ci` if needed, fails with a clear error without npm. `ENABLE_USER_SCRIPT_SANDBOXING = NO` on the extension targets, because the script writes `popup.js` to the source folder.
   - Both schemes build (unsigned, with Xcode's PATH). Not tested in Safari yet.
 
-## 2. Dependencies and Editor refactor — todo
+## 2. Dependencies and Editor refactor — done
 
-React 19, Parcel/esbuild, immutable state in Editor, stable `id` per search, Xcode project upgrade, Swift 5.10/6.
+- Sources in `Shared (Extension)/Resources/src/`: `popup.jsx`, `Editor.jsx`, `background.js`, plus `search.js` (URL parsing/expansion) and `data.js` (version, defaults, upgrade, validation, ids). esbuild bundles to `popup.js` and `background.js` (same paths as before, so Xcode refs are unchanged). Build output no longer committed; a missing npm is a build error in Xcode.
+- React 17 → 19.3 (`createRoot`), Parcel → esbuild 0.28.
+- Editor: immutable state, selection by `id` instead of index, sorting no longer mutates state, unsaved new searches are never persisted.
+- Ids: existing searches get a deterministic id (hash of content) so all devices derive the same ids; new searches get `crypto.randomUUID()`.
+- Bugs found along the way: per-search "Front only" was ignored when the global setting was "Front and end"; v2 upgrade kept `version: 2` (import of v2 failed, re-upgraded on every load).
+- Bug: the background cache (localStorage) from the old version had no ids, and `undefined == null` made the popup open straight into the first search. Ids are now added on cache load and in the Editor; strict comparisons.
+- Tests: `npm test` (vitest), 20 tests: all known Safari URLs, expansion, keyword location, upgrade v1/v2, ids, and UI tests for the Editor (jsdom + Testing Library): list without ids, open/edit/add/cancel/delete, default, settings preserved. Checked that the regression test fails on the old code.
+- Tested by hand in the iOS simulator.
+- Swift 6 / project upgrade postponed to step 3 (Data.swift is rewritten there anyway).
 
 ## 3. Sync — todo
+
+**Requirement: tests for upgrading from any older version to any newer one.** Fixtures with real data from each format (v1, v2, v3 without ids, v3 with ids, the new sync format), and tests that each one is upgraded correctly to every newer version. Also cross-version: an old app on another device that reads/writes the new format via iCloud (e.g. the old Editor drops `id` and unknown fields when a search is saved), so it must not break or lose data.
 
 Per-search merging (`id`, `updatedAt`, tombstones) instead of last-writer-wins on the whole blob. Handle iCloud KVS notification reasons. Load from native at startup/popup/interval, not on every navigation.
 
