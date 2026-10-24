@@ -53,6 +53,22 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
 #endif
     }
 
+    // Links (the privacy policy) open in the default browser instead of inside the app
+    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping @MainActor @Sendable (WKNavigationActionPolicy) -> Void) {
+        guard navigationAction.navigationType == .linkActivated,
+              let url = navigationAction.request.url,
+              url.scheme == "https" else {
+            decisionHandler(.allow)
+            return
+        }
+#if os(macOS)
+        NSWorkspace.shared.open(url)
+#elseif os(iOS)
+        UIApplication.shared.open(url)
+#endif
+        decisionHandler(.cancel)
+    }
+
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if (message.body as? String != "open-preferences") {
             return;

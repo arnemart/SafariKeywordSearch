@@ -89,3 +89,11 @@ img {
 button {
     font-size: 1em;
 }
+
+a {
+    cursor: pointer;
+}
+
+.privacy {
+    font-size: 0.85em;
+}
