@@ -1,24 +1,32 @@
-import { CURRENT_VERSION, defaultSearches, upgradeData, validateData, ensureIds } from './data.js'
+import { CURRENT_VERSION, defaultSearches, upgradeData, validateData } from './data.js'
 import { getSearchParam, getSearchUrl, buildIndex } from './search.js'
+import { syncStores, applyEdit, replaceAll, view, parseState, emptyState, applyWrites } from './sync.js'
 
-let latestFullData = {}
+// How often navigation checks for changes from other devices
+const SYNC_INTERVAL = 30_000
+const NATIVE_TIMEOUT = 2000
+
+// Null until loaded from the cache or the native side
+let state = null
 let index = buildIndex({ searches: [] })
-let lastUpdate = -1
+// The values last read from or written to native storage
+let stores = { local: {}, cloud: {} }
+let lastSync = 0
+let syncing = null
 
 try {
-  // See if we have cached data in local storage, use that until we have loaded data from the app
-  const cachedFullData = localStorage.getItem('latestFullData')
-  if (cachedFullData) {
-    const parsedFullData = JSON.parse(cachedFullData)
-    if (parsedFullData.version == CURRENT_VERSION) {
-      // Cache may predate ids
-      latestFullData = { ...parsedFullData, searches: ensureIds(parsedFullData.searches) }
-      index = buildIndex(latestFullData)
-      const cachedLastUpdate = localStorage.getItem('lastUpdate')
-      if (cachedLastUpdate) lastUpdate = parseInt(cachedLastUpdate, 10)
-    }
-  }
+  // Cached state, used until the native side has answered
+  state = parseState(localStorage.getItem('state'))
+  if (state) index = buildIndex(view(state))
 } catch (e) {}
+
+function setState(newState) {
+  state = newState
+  index = buildIndex(view(state))
+  try {
+    localStorage.setItem('state', JSON.stringify(state))
+  } catch (e) {}
+}
 
 browser.webNavigation.onBeforeNavigate.addListener(beforeNavigate)
 
@@ -26,123 +34,92 @@ browser.webNavigation.onCommitted.addListener(onCommitted)
 
 // Listener must return true when responding asynchronously
 browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+  const respond = promise => {
+    promise.then(
+      () => sendResponse({ success: true }),
+      e => {
+        console.log('Error saving search data:', e)
+        sendResponse({ success: false })
+      }
+    )
+    return true
+  }
+
   switch (request.message) {
     case 'popupWantsData': {
-      loadData(() => sendResponse({ data: latestFullData }))
+      sync().then(() => sendResponse({ data: view(state) }))
       return true
     }
     case 'popupWantsToSave': {
-      saveData({
-        version: CURRENT_VERSION,
-        timestamp: Date.now(),
-        searches: request.data.searches,
-        settings: request.data.settings
-      })
-      break
+      const { base, searches, settings } = request.data
+      return respond(commit((s, now) => applyEdit(s, base, { searches, settings }, now)))
     }
     case 'popupWantsToImport': {
+      let data = null
       try {
-        let json = JSON.parse(request.data)
-        if (!json.version || json.version < CURRENT_VERSION) {
-          json = upgradeData(json)
-        }
-        if (json.version == CURRENT_VERSION && validateData(json)) {
-          saveData({ ...json, timestamp: Date.now() }, () => sendResponse({ success: true }))
-          return true
-        }
-        console.log('Error importing search data: invalid data', request.data)
-      } catch (e) {
-        console.log('Error importing search data:', e, request.data)
+        data = JSON.parse(request.data)
+        if (!data.version || data.version < CURRENT_VERSION) data = upgradeData(data)
+      } catch (e) {}
+      if (data && data.version == CURRENT_VERSION && validateData(data)) {
+        return respond(commit((s, now) => replaceAll(s, data, now)))
       }
+      console.log('Error importing search data: invalid data', request.data)
       sendResponse({ success: false })
       break
     }
     case 'popupWantsToReset': {
-      saveData(
-        {
-          ...defaultSearches,
-          timestamp: Date.now()
-        },
-        () => sendResponse({ success: true })
-      )
-      return true
+      return respond(commit((s, now) => replaceAll(s, defaultSearches, now)))
     }
   }
 })
 
-const message = (message, data = '') =>
-  JSON.stringify({
-    message: message,
-    data: data
-  })
+const message = (message, data = '') => JSON.stringify({ message, data })
 
-function saveData(data, andThen) {
-  setData(data, andThen)
-  browser.runtime.sendNativeMessage('application.id', message('saveData', JSON.stringify(data)))
+function sendNative(msg) {
+  return Promise.race([
+    browser.runtime.sendNativeMessage('application.id', msg),
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Native message timed out')), NATIVE_TIMEOUT))
+  ])
 }
 
-let lastLoad = 0
-// Callbacks waiting for an in-flight load, null when no load is running
-let pendingLoadCallbacks = null
-function loadData(andThen) {
-  if (pendingLoadCallbacks) {
-    if (andThen) pendingLoadCallbacks.push(andThen)
-    return
-  }
-  const now = Date.now()
-  if (now - lastLoad <= 200) {
-    if (andThen) andThen()
-    return
-  }
-  lastLoad = now
-  pendingLoadCallbacks = andThen ? [andThen] : []
+async function writeStores(writes) {
+  if (Object.keys(writes.local).length == 0 && Object.keys(writes.cloud).length == 0) return
+  stores = applyWrites(stores, writes)
+  await sendNative(message('save', JSON.stringify(writes)))
+}
 
-  const done = () => {
-    if (!pendingLoadCallbacks) return
-    const callbacks = pendingLoadCallbacks
-    pendingLoadCallbacks = null
-    callbacks.forEach(cb => cb())
-  }
-  // Fall back to cached data if the native side never answers
-  setTimeout(done, 2000)
-
-  browser.runtime.sendNativeMessage('application.id', message('loadData'), response => {
-    if (response === undefined) {
-      console.log('Error loading search data:', browser.runtime.lastError)
-      done()
-    } else if (response == '') {
-      saveData(defaultSearches, done)
-    } else {
+// Reads all stores, merges them and writes back whatever differs. Concurrent calls share one run.
+function sync() {
+  if (!syncing) {
+    syncing = (async () => {
       try {
-        const json = JSON.parse(response)
-        if (json.version && json.version == CURRENT_VERSION) {
-          setData(json, done)
-        } else {
-          const upgradedData = upgradeData(json)
-          saveData(upgradedData, done)
-        }
+        stores = JSON.parse(await sendNative(message('load')))
+        const result = syncStores(stores, state, Date.now())
+        setState(result.state)
+        lastSync = Date.now()
+        await writeStores(result.writes)
       } catch (e) {
-        console.log('Error parsing search data:', e, response)
-        done()
+        console.log('Error syncing search data:', e)
+        if (!state) setState(emptyState())
+      } finally {
+        syncing = null
       }
-    }
-  })
-}
-
-loadData()
-
-function setData(data, andThen) {
-  if (data.timestamp > lastUpdate) {
-    latestFullData = { ...data, searches: ensureIds(data.searches) }
-    lastUpdate = data.timestamp
-    index = buildIndex(latestFullData)
-    try {
-      localStorage.setItem('latestFullData', JSON.stringify(latestFullData))
-      localStorage.setItem('lastUpdate', lastUpdate)
-    } catch (e) {}
+    })()
   }
-  if (andThen) andThen()
+  return syncing
 }
+
+const syncIfStale = () => (Date.now() - lastSync > SYNC_INTERVAL ? sync() : Promise.resolve())
+
+// Syncs, applies a change on top of the fresh state and writes it out
+async function commit(change) {
+  await sync()
+  const result = syncStores(stores, change(state, Date.now()), Date.now())
+  setState(result.state)
+  await writeStores(result.writes)
+}
+
+sync()
 
 let shouldDoTheSearch = false
 let lastSearched = 0
@@ -171,11 +148,11 @@ function beforeNavigate(details) {
   if (details.parentFrameId == -1 && details.tabId > 0) {
     const now = Date.now()
     if (now - (lastInvoked.get(details.tabId) || 0) > 500) {
-      if (lastUpdate == -1) {
-        loadData(() => doTheSearch(details))
+      if (!state) {
+        sync().then(() => doTheSearch(details))
       } else {
         doTheSearch(details)
-        loadData()
+        syncIfStale()
       }
       lastInvoked.set(details.tabId, now)
     }

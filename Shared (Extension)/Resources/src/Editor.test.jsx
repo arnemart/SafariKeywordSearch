@@ -114,3 +114,18 @@ test('changed settings survive saving a search', () => {
   clickButton(container, 'Save')
   expect(lastSaved().settings.allowedLocations).toBe('frontAndEnd')
 })
+
+test('each save sends what it was based on', () => {
+  const { container, save } = setup()
+  fireEvent.click(listItems(container)[0])
+  fireEvent.change(input(container, 'name'), { target: { value: 'Zamazon' } })
+  clickButton(container, 'Save')
+  fireEvent.click(listItems(container)[0])
+  clickButton(container, 'Delete')
+  clickButton(container, 'Confirm?')
+
+  const [first, second] = save.mock.calls.map(([data]) => data)
+  expect(first.base.searches.map(s => s.name)).toEqual(['YouTube', 'Amazon', 'DuckDuckGo'])
+  expect(second.base).toEqual({ searches: first.searches, settings: first.settings })
+  expect(second.searches).toHaveLength(2)
+})

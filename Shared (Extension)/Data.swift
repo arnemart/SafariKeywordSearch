@@ -6,97 +6,62 @@
 //
 
 import Foundation
-import SafariServices.SFSafariApplication
+import os.log
 
-struct StoredData: Decodable {
-    var timestamp: Int
-}
+// Raw storage for the extension. All merging and upgrading happens in JS (src/sync.js), this only reads and
+// writes the stored strings, locally (shared app group) and in iCloud key-value storage.
+enum KeywordSearchStore {
+    static let keys = ["keywordSearches", "keywordSearchesv3", "keywordSearchesv4"]
 
-private func nilOrEmpty(s: String?) -> Bool {
-    return s == nil || s == "" || s == "{}"
-}
-
-private func getTimestamp(json: String) -> Int {
-    if let ts = try? JSONDecoder().decode(StoredData.self, from: json.data(using: .utf8)!) {
-        return ts.timestamp
-    } else {
-        return 0
-    }
-}
-
-class KeywordSearchData {
-    static let instance = KeywordSearchData()
-
-    private let keyv1 = "keywordSearches"
-    private let key = "keywordSearchesv3"
-    private let userDefaults: UserDefaults? = UserDefaults(suiteName: "group.5YSSE2V8P3.net.aurlien.SafariKeywordSearch")
-    private let icloudData: NSUbiquitousKeyValueStore = NSUbiquitousKeyValueStore.default
-    private var jsonData: String = ""
-    private var lastSave: Int = 0
-
-    private init() {
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(icloudNotify(_:)),
-                                               name: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
-                                               object: self.icloudData)
-
-        self.initData(keyToCheck: self.key)
+    private static var local: UserDefaults? {
+        UserDefaults(suiteName: "group.5YSSE2V8P3.net.aurlien.SafariKeywordSearch")
     }
 
-    private func initData(keyToCheck: String) {
-        let checkingOldKey = keyToCheck != self.key
-        
-        let storedData = self.userDefaults?.string(forKey: keyToCheck)
+    private static var cloud: NSUbiquitousKeyValueStore {
+        NSUbiquitousKeyValueStore.default
+    }
 
-        self.icloudData.synchronize()
-        let icloudData = self.icloudData.string(forKey: keyToCheck)
+    static func load() -> [String: [String: String]] {
+        let local = self.local
+        let cloud = self.cloud
+        cloud.synchronize()
 
-        if (nilOrEmpty(s: storedData) && !nilOrEmpty(s: icloudData)) {
-            self.save(data: icloudData!, skipIcloud: !checkingOldKey)
-        } else if (!nilOrEmpty(s: storedData) && nilOrEmpty(s: icloudData)) {
-            self.save(data: storedData!)
-        } else if (!nilOrEmpty(s: storedData) && !nilOrEmpty(s: icloudData)) {
-            let icloudLastSave = getTimestamp(json: icloudData!)
-            let storedLastSave = getTimestamp(json: storedData!)
-            if (storedLastSave > icloudLastSave) {
-                self.save(data: storedData!)
-            } else {
-                self.save(data: icloudData!, skipIcloud: !checkingOldKey)
-            }
-        } else if (!checkingOldKey) {
-            self.initData(keyToCheck: self.keyv1)
+        var localValues: [String: String] = [:]
+        var cloudValues: [String: String] = [:]
+        for key in keys {
+            localValues[key] = local?.string(forKey: key)
+            cloudValues[key] = cloud.string(forKey: key)
         }
-    }
-    
-    @objc
-    func icloudNotify(_ notification: Notification) {
-        self.checkIcloudData()
+        return ["local": localValues, "cloud": cloudValues]
     }
 
-    func checkIcloudData() {
-        self.icloudData.synchronize()
-        let icloudData = self.icloudData.string(forKey: self.key)
+    static func save(_ writes: [String: [String: String]]) {
+        let local = self.local
+        for (key, value) in writes["local"] ?? [:] where keys.contains(key) {
+            local?.set(value, forKey: key)
+        }
 
-        if (!nilOrEmpty(s: icloudData)) {
-            let icloudLastSave = getTimestamp(json: icloudData!)
-            if (icloudLastSave > self.lastSave) {
-                self.save(data: icloudData!, skipIcloud: true)
-            }
+        let cloud = self.cloud
+        let cloudWrites = writes["cloud"] ?? [:]
+        for (key, value) in cloudWrites where keys.contains(key) {
+            cloud.set(value, forKey: key)
+        }
+        if !cloudWrites.isEmpty {
+            cloud.synchronize()
         }
     }
 
-    func getData() -> String {
-        self.checkIcloudData()
-        return self.jsonData
-    }
-
-    func save(data: String, skipIcloud: Bool = false) {
-        self.jsonData = data
-        self.lastSave = getTimestamp(json: data)
-        self.userDefaults?.set(data, forKey: self.key)
-        if (!skipIcloud && self.lastSave > 0) {
-            self.icloudData.set(data, forKey: self.key)
-            self.icloudData.synchronize()
+    static func logExternalChange(_ notification: Notification) {
+        guard let reason = notification.userInfo?[NSUbiquitousKeyValueStoreChangeReasonKey] as? Int else {
+            return
+        }
+        switch reason {
+        case NSUbiquitousKeyValueStoreQuotaViolationChange:
+            os_log(.error, "iCloud key-value storage quota exceeded")
+        case NSUbiquitousKeyValueStoreAccountChange:
+            os_log(.info, "iCloud account changed")
+        default:
+            break
         }
     }
 }

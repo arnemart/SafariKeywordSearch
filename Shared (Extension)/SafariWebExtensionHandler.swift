@@ -16,9 +16,17 @@ struct MessageFromBrowser: Decodable {
 }
 
 class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
-    private let jsonDecoder = JSONDecoder()
-    private let data = KeywordSearchData.instance
-    
+    private let observer = NotificationCenter.default.addObserver(
+        forName: NSUbiquitousKeyValueStore.didChangeExternallyNotification,
+        object: nil,
+        queue: nil,
+        using: KeywordSearchStore.logExternalChange
+    )
+
+    deinit {
+        NotificationCenter.default.removeObserver(observer)
+    }
+
     func beginRequest(with context: NSExtensionContext) {
         let response = NSExtensionItem()
         response.userInfo = [ SFExtensionMessageKey: handle(context.inputItems.first as? NSExtensionItem) ]
@@ -29,19 +37,26 @@ class SafariWebExtensionHandler: NSObject, NSExtensionRequestHandling {
     private func handle(_ item: NSExtensionItem?) -> String {
         guard let messageString = item?.userInfo?[SFExtensionMessageKey] as? String,
               let messageData = messageString.data(using: .utf8),
-              let message = try? self.jsonDecoder.decode(MessageFromBrowser.self, from: messageData) else {
+              let message = try? JSONDecoder().decode(MessageFromBrowser.self, from: messageData) else {
             os_log(.error, "Could not decode message from browser")
             return "error"
         }
 
         switch (message.message) {
-        case "loadData":
-            return data.getData()
-        case "saveData":
-            data.save(data: message.data)
-            return "ok!"
+        case "load":
+            guard let json = try? JSONSerialization.data(withJSONObject: KeywordSearchStore.load()) else {
+                return "error"
+            }
+            return String(decoding: json, as: UTF8.self)
+        case "save":
+            guard let writes = try? JSONDecoder().decode([String: [String: String]].self, from: Data(message.data.utf8)) else {
+                os_log(.error, "Could not decode data to save")
+                return "error"
+            }
+            KeywordSearchStore.save(writes)
+            return "ok"
         default:
-            return "hm"
+            return "unknown message"
         }
     }
 }

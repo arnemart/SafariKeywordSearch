@@ -23,9 +23,16 @@ const Editor = props => {
   const listRef = useRef(null)
   const [recentlyDeleted, setRecentlyDeleted] = useState(null)
 
+  // What the last save was based on, so the background can tell what the user actually changed
+  const base = useRef(null)
+  if (!base.current) base.current = { searches, settings }
+
   // Unsaved new searches are never persisted
-  const persist = (newSearches, newSettings) =>
-    props.save({ searches: newSearches.filter(s => !s.new), settings: newSettings })
+  const persist = (newSearches, newSettings) => {
+    const data = { searches: newSearches.filter(s => !s.new), settings: newSettings }
+    props.save({ ...data, base: base.current })
+    base.current = data
+  }
 
   const select = id => {
     setPrevSelectedId(selectedId)
