@@ -9,6 +9,7 @@ export const defaultSearches = {
   },
   searches: [
     { name: 'Amazon', keywords: 'az', expansion: 'https://www.amazon.com/s?k=@@@' },
+    { name: 'Apple Maps', keywords: 'am', expansion: 'https://maps.apple.com/?q=@@@' },
     {
       name: 'Archive.org Wayback Machine',
       keywords: 'ao, wm',
@@ -23,15 +24,24 @@ export const defaultSearches = {
       escape: false
     },
     { name: 'Ebay', keywords: 'ebay', expansion: 'https://www.ebay.com/sch/i.html?_nkw=@@@' },
+    { name: 'GitHub', keywords: 'gh', expansion: 'https://github.com/search?q=@@@' },
     { name: 'Google', keywords: 'g', expansion: 'https://www.google.com/search?q=@@@' },
-    { name: 'Google maps', keywords: 'gm, gmaps', expansion: 'https://www.google.com/maps?oi=map&q=@@@' },
     { name: 'Google images', keywords: 'gi', expansion: 'https://www.google.com/search?udm=2&q=@@@' },
+    { name: 'Google maps', keywords: 'gm, gmaps', expansion: 'https://www.google.com/maps/search/?api=1&query=@@@' },
+    { name: 'Google Translate', keywords: 'tr', expansion: 'https://translate.google.com/?sl=auto&text=@@@&op=translate' },
     { name: 'IMDB', keywords: 'imdb', expansion: 'https://www.imdb.com/find/?q=@@@' },
+    { name: 'Reddit', keywords: 'rd', expansion: 'https://www.reddit.com/search/?q=@@@' },
     { name: 'Stack Overflow', keywords: 'so', expansion: 'https://stackoverflow.com/search?q=@@@' },
     {
       name: 'Wikipedia',
       keywords: 'w, wi',
       expansion: 'https://en.wikipedia.org/wiki/Special:Search/@@@',
+      spaceReplacer: '_'
+    },
+    {
+      name: 'Wiktionary',
+      keywords: 'def',
+      expansion: 'https://en.wiktionary.org/wiki/Special:Search/@@@',
       spaceReplacer: '_'
     },
     { name: 'Wolfram Alpha', keywords: 'wa', expansion: 'https://www.wolframalpha.com/input/?i=@@@' },

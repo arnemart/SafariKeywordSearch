@@ -51,3 +51,11 @@ test('ensureIds gives duplicates distinct ids', () => {
   const ids = ensureIds([s, s]).map(s => s.id)
   assert.notEqual(ids[0], ids[1])
 })
+
+test('default keywords are unique and expansions are usable', () => {
+  const keywords = defaultSearches.searches.flatMap(s => s.keywords.split(/\s*,\s*/))
+  assert.equal(new Set(keywords).size, keywords.length)
+  for (const s of defaultSearches.searches) {
+    assert.match(s.expansion, /^https:\/\/.*@@@/, s.name)
+  }
+})
