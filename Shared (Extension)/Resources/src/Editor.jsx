@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { ensureIds } from './data.js'
-import { searchEngines } from './search.js'
+import { searchEngines, splitKeywords } from './search.js'
 
 const keywordRegex = /\S+/
 const urlRegex = /^https?:\/\/.+/
@@ -119,6 +119,7 @@ const Editor = props => {
           <Screen key={`editor-${selected.id}`} animate="animate-in-left">
             <EditIt
               search={selected}
+              takenKeywords={keywordOwners(searches.filter(s => s.id !== selected.id && !s.new))}
               save={saveOne(selected.id)}
               deleteOne={deleteOne(selected.id)}
               collapse={expandMe(null)}
@@ -270,7 +271,11 @@ const JustOne = ({ search, expand }) => {
   )
 }
 
-const EditIt = ({ search, collapse, save, deleteOne }) => {
+// Which search uses each keyword, for spotting duplicates
+const keywordOwners = searches =>
+  new Map(searches.flatMap(s => splitKeywords(s.keywords).map(k => [k, s.name || s.keywords])))
+
+const EditIt = ({ search, takenKeywords = new Map(), collapse, save, deleteOne }) => {
   const [vals, setVals] = useState({
     name: search.name,
     keywords: search.keywords,
@@ -288,8 +293,15 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
 
   const errors = {}
 
+  const keywords = splitKeywords(vals.keywords)
+  const duplicate = keywords.find((k, i) => keywords.indexOf(k) != i)
+  const taken = keywords.find(k => takenKeywords.has(k))
   if (!keywordRegex.test(vals.keywords)) {
     errors.keywords = 'Please provide a keyword'
+  } else if (taken) {
+    errors.keywords = `“${taken}” is already used by ${takenKeywords.get(taken)}`
+  } else if (duplicate) {
+    errors.keywords = `“${duplicate}” is listed twice`
   }
   if (!urlRegex.test(vals.expansion)) {
     errors.expansion = 'Needs to be a valid URL'

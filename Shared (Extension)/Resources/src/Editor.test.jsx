@@ -147,3 +147,35 @@ test('choosing the search engine saves the setting', () => {
   fireEvent.change(select, { target: { value: 'duckduckgo' } })
   expect(lastSaved().settings).toEqual({ allowedLocations: 'frontOnly', searchEngine: 'duckduckgo' })
 })
+
+const keywordError = container => editor(container).querySelector('.error')?.textContent
+const saveButton = container => within(editor(container)).getAllByRole('button', { name: 'Save' }).at(-1)
+
+test('keywords used by another search are rejected', () => {
+  const { container, save } = setup()
+  fireEvent.click(screen.getByRole('button', { name: '+ Add new' }))
+  fireEvent.change(input(container, 'keywords'), { target: { value: 'x, Y' } })
+  fireEvent.change(input(container, 'expansion'), { target: { value: 'https://example.com/@@@' } })
+
+  expect(keywordError(container)).toBe('“y” is already used by YouTube')
+  expect(saveButton(container).disabled).toBe(true)
+  clickButton(container, 'Save')
+  expect(save).not.toHaveBeenCalled()
+})
+
+test('the same keyword twice is rejected', () => {
+  const { container } = setup()
+  fireEvent.click(listItems(container)[0])
+  fireEvent.change(input(container, 'keywords'), { target: { value: 'a, b, A' } })
+  expect(keywordError(container)).toBe('“a” is listed twice')
+  expect(saveButton(container).disabled).toBe(true)
+})
+
+test('a search can keep its own keywords', () => {
+  const { container, lastSaved } = setup()
+  fireEvent.click(listItems(container)[2])
+  fireEvent.change(input(container, 'keywords'), { target: { value: 'y, yt' } })
+  expect(keywordError(container)).toBeUndefined()
+  clickButton(container, 'Save')
+  expect(lastSaved().searches.find(s => s.name == 'YouTube').keywords).toBe('y, yt')
+})

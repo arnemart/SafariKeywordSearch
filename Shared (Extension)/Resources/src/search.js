@@ -62,6 +62,13 @@ export function getSearchParam(urlString, engine = 'any') {
   }
 }
 
+// The keywords of a search, lowercased, as they are matched
+export const splitKeywords = keywords =>
+  keywords
+    .split(',')
+    .map(k => k.trim().toLowerCase())
+    .filter(Boolean)
+
 // Lookup structure for getSearchUrl
 export function buildIndex(data) {
   const byKeyword = {}
@@ -70,8 +77,8 @@ export function buildIndex(data) {
     if (s.isDefault) {
       defaultSearch = s
     }
-    for (const k of s.keywords.split(/\s*,\s*/)) {
-      byKeyword[k.toLowerCase()] = s
+    for (const k of splitKeywords(s.keywords)) {
+      byKeyword[k] = s
     }
   }
   return { byKeyword, defaultSearch, settings: data.settings || {} }

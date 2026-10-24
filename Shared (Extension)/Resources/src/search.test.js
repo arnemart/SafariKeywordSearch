@@ -155,3 +155,9 @@ describe('searchEngine setting', () => {
     expect(getSearchParam('https://www.google.com/search?q=monkey')).toBe('monkey')
   })
 })
+
+test('keywords are trimmed and matched case-insensitively', () => {
+  const index = buildIndex({ searches: [{ name: 'X', keywords: ' Xx ,  yy ', expansion: 'https://x/@@@' }], settings: {} })
+  expect(getSearchUrl('xx a', index)).toBe('https://x/a')
+  expect(getSearchUrl('YY a', index)).toBe('https://x/a')
+})
