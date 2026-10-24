@@ -1,6 +1,6 @@
 import { test, describe, expect } from 'vitest'
 import assert from 'node:assert/strict'
-import { getSearchParam, getSearchUrl, buildIndex } from './search.js'
+import { getSearchParam, getSearchUrl, buildIndex, encodeUrl } from './search.js'
 import { defaultSearches } from './data.js'
 
 test('getSearchParam extracts the query from Safari search URLs', () => {
@@ -160,4 +160,43 @@ test('keywords are trimmed and matched case-insensitively', () => {
   const index = buildIndex({ searches: [{ name: 'X', keywords: ' Xx ,  yy ', expansion: 'https://x/@@@' }], settings: {} })
   expect(getSearchUrl('xx a', index)).toBe('https://x/a')
   expect(getSearchUrl('YY a', index)).toBe('https://x/a')
+})
+
+describe('characters that are not allowed in URLs', () => {
+  const forum =
+    'https://example.com/search/search/?keywords=@@@&constraints={"search_type":"post","c":{"nodes":[26],"child_nodes":1}}'
+  const index = buildIndex({ searches: [{ name: 'Forum', keywords: 'fs', expansion: forum }], settings: {} })
+  const allowed = /^[a-z0-9\-._~!$&'()*+,;=:@/?#%]*$/i
+
+  test('are encoded in the expanded URL (issue #34)', () => {
+    const url = getSearchUrl('fs monkey business', index)
+    expect(url).toBe(
+      'https://example.com/search/search/?keywords=monkey+business&constraints=%7B%22search_type%22:%22post%22,%22c%22:%7B%22nodes%22:%5B26%5D,%22child_nodes%22:1%7D%7D'
+    )
+    expect(url).toMatch(allowed)
+    // Servers decode it back to the original JSON
+    expect(new URL(url).searchParams.get('constraints')).toBe('{"search_type":"post","c":{"nodes":[26],"child_nodes":1}}')
+  })
+
+  test('already encoded characters are left alone', () => {
+    expect(encodeUrl('https://example.com/?a=%22x%22&b={y}')).toBe('https://example.com/?a=%22x%22&b=%7By%7D')
+    expect(encodeUrl(encodeUrl(forum))).toBe(encodeUrl(forum))
+  })
+
+  test('spaces, stray percent signs and non-ASCII are encoded', () => {
+    expect(encodeUrl('https://example.com/a b?q=100%&r=æ')).toBe('https://example.com/a%20b?q=100%25&r=%C3%A6')
+  })
+
+  test('the host is not touched', () => {
+    expect(encodeUrl('https://exämple.com/?q="')).toBe('https://exämple.com/?q=%22')
+  })
+
+  test('default searches are unchanged', () => {
+    const index = buildIndex(defaultSearches)
+    for (const s of defaultSearches.searches) {
+      const keyword = s.keywords.split(',')[0].trim()
+      const raw = s.expansion.replaceAll('@@@', s.escape === false ? 'example.com/a?b' : 'monkey')
+      expect(getSearchUrl(`${keyword} ${s.escape === false ? 'example.com/a?b' : 'monkey'}`, index), s.name).toBe(raw)
+    }
+  })
 })

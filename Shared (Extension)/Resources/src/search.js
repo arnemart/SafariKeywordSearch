@@ -62,6 +62,24 @@ export function getSearchParam(urlString, engine = 'any') {
   }
 }
 
+// Percent-encodes characters that aren't allowed in URLs (quotes, braces, spaces etc.) after the host, so strict URL
+// parsers accept the result. Already encoded characters are left alone, so this is safe to apply more than once.
+export function encodeUrl(url) {
+  const parts = url.match(/^([a-z][a-z0-9+.-]*:\/\/[^/?#]*)(.*)$/is)
+  if (!parts) return url
+  const [, origin, rest] = parts
+  return (
+    origin +
+    rest.replace(/%(?![0-9a-f]{2})|[^a-z0-9\-._~!$&'()*+,;=:@/?#%]/giu, c => {
+      try {
+        return encodeURIComponent(c)
+      } catch (e) {
+        return ''
+      }
+    })
+  )
+}
+
 // The keywords of a search, lowercased, as they are matched
 export const splitKeywords = keywords =>
   keywords
@@ -110,6 +128,6 @@ export function getSearchUrl(searchParam, index) {
   if (match) {
     const spaceReplacer = match.spaceReplacer || '+'
     const phrase = match.escape === false ? searchPhrase : searchPhrase.map(s => encodeURIComponent(s))
-    return match.expansion.replaceAll('@@@', phrase.join(spaceReplacer))
+    return encodeUrl(match.expansion.replaceAll('@@@', phrase.join(spaceReplacer)))
   }
 }
