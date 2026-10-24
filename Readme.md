@@ -67,7 +67,7 @@ Parsing the URL to get the search string is not optimal, but it’s the only way
 - If you have more than one keyword the extension can in rare cases trigger multiple times (i.e. if you enter ddg g w monkey) (there are workarounds for this in place but it can happen anyway).
 - Baidu, Sogou and 360 Search are only recognized by their domain, so the “Safari’s search engine” setting can’t tell searches from the address bar apart from searches on their websites.
 
-Redirecting with `declarativeNetRequest` instead would avoid loading the search engine at all, but in Safari 27 it makes Safari regularly reload the page with “This webpage was reloaded because of a problem”, so it’s not used (see `PLAN.md`).
+Redirecting with `declarativeNetRequest` instead would avoid loading the search engine at all, but in Safari 27 it makes Safari regularly reload the page with “This webpage was reloaded because of a problem”, so it’s not used.
 
 The previous previous Safari Extension API had a beforeSearch event that was a lot more convenient. To any Safari developers who might be reading this: hello!
 
