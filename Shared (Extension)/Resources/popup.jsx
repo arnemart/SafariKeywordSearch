@@ -50,7 +50,7 @@ function reload() {
 }
 
 function resetData() {
-  browser.runtime.sendMessage({
+  return browser.runtime.sendMessage({
     message: 'popupWantsToReset'
   })
 }

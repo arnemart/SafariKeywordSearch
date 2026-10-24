@@ -13,6 +13,7 @@ const Screen = React.forwardRef(({ animate, children }, ref) => (
 
 const Editor = props => {
   const [searches, setSearches] = useState(props.data.searches)
+  const [settings, setSettings] = useState(props.data.settings)
   const [selected, setSelected] = useState(-1)
   const [prevSelected, setPrevSelected] = useState(-1)
   const listRef = useRef(null)
@@ -33,21 +34,23 @@ const Editor = props => {
       setSearches(searches)
       setPrevSelected(selected)
       setSelected(-1)
-      props.save({ searches: searches, settings: props.data.settings })
+      props.save({ searches: searches, settings: settings })
     }
   }
 
-  const saveSettings = settings => {
-    props.save({ searches: searches, settings: settings })
+  const saveSettings = changes => {
+    const newSettings = { ...settings, ...changes }
+    setSettings(newSettings)
+    props.save({ searches: searches, settings: newSettings })
   }
 
   const deleteOne = i => () => {
-    const deleted = searches.splice(i, 1)
+    const [deleted] = searches.splice(i, 1)
     setRecentlyDeleted(deleted)
     setSearches(searches)
     setPrevSelected(selected)
     setSelected(-1)
-    props.save({ searches: searches, settings: props.data.settings })
+    props.save({ searches: searches, settings: settings })
   }
 
   const expandMe = i => () => {
@@ -63,8 +66,8 @@ const Editor = props => {
 
   const exportData = () => {
     const dataToExport = {
-      searches: props.data.searches,
-      settings: props.data.settings,
+      searches: searches,
+      settings: settings,
       version: props.data.version
     }
     navigator.clipboard.writeText(JSON.stringify(dataToExport))
@@ -79,7 +82,7 @@ const Editor = props => {
         <Screen key="list" animate={listAnimationName} ref={listRef}>
           <List searches={searches} expandMe={expandMe} createNew={createNew} os={props.os} />
           <Settings
-            settings={props.data.settings}
+            settings={settings}
             save={saveSettings}
             exportData={exportData}
             importData={props.importData}
@@ -88,7 +91,7 @@ const Editor = props => {
           />
         </Screen>
         {selected > -1 && (
-          <Screen key={`editor-{selected}`} animate="animate-in-left">
+          <Screen key={`editor-${selected}`} animate="animate-in-left">
             <EditIt
               search={searches[selected]}
               save={saveOne(selected)}
@@ -98,7 +101,7 @@ const Editor = props => {
           </Screen>
         )}
         {selected == -1 && prevSelected > -1 && (
-          <Screen key={`editor-{prevSelected}`} animate="animate-out-left">
+          <Screen key={`editor-${prevSelected}`} animate="animate-out-left">
             <EditIt
               search={recentlyDeleted || searches[prevSelected]}
               save={() => {}}
@@ -164,9 +167,10 @@ const Settings = ({ settings, save, exportData, importData, reload, resetData })
     setImporting(false)
     if (resetting) {
       setResetting(false)
-      resetData()
-      reload()
-      window.scrollTo(0, 0)
+      resetData().then(() => {
+        reload()
+        window.scrollTo(0, 0)
+      })
     } else {
       setResetting(true)
     }
@@ -225,7 +229,7 @@ const JustOne = ({ search, expand }) => {
   return (
     <li className="list__item" onClick={expand}>
       <JustTheHeader search={search} />
-      <small class="tiny oneliner">{search.expansion}</small>
+      <small className="tiny oneliner">{search.expansion}</small>
     </li>
   )
 }
@@ -272,7 +276,8 @@ const EditIt = ({ search, collapse, save, deleteOne }) => {
 
   const cancel = search.new ? deleteOne : collapse
 
-  const handleSubmit = () => {
+  const handleSubmit = e => {
+    e.preventDefault()
     if (valid) {
       save(vals)
     } else {
@@ -447,7 +452,7 @@ const FormFieldWithHelpTextEtc = ({
         {label}
         <select name={name} defaultValue={vals[name]} onChange={e => update(name, e.target.value)}>
           {options.map(option => (
-            <option value={option.value}>{option.name}</option>
+            <option key={option.value} value={option.value}>{option.name}</option>
           ))}
         </select>
       </>
@@ -460,7 +465,7 @@ const FormFieldWithHelpTextEtc = ({
     )}
     {helpText && (
       <div>
-        <small class="tiny">{helpText}</small>
+        <small className="tiny">{helpText}</small>
       </div>
     )}
   </label>

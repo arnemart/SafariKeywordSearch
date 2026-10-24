@@ -1,16 +1,18 @@
 const CURRENT_VERSION = 3
 
-const searchDomainRegex = /^(www\.)?(search\.yahoo|google|duckduckgo|bing|ecosia|baidu|soguo|so)(\.[a-z]{2,}){1,2}$/
+// Matches www./m. prefixes and regional Yahoo subdomains (e.g. no.search.yahoo.com)
+const searchDomainRegex =
+  /^(?:www\.|m\.|[a-z]{2,10}\.(?=search\.yahoo\.))?(search\.yahoo|google|duckduckgo|bing|ecosia|baidu|sogou|so)(\.[a-z]{2,}){1,2}$/
 
 const searchEngineParameters = {
-  'search.yahoo': 'p',
-  google: 'q',
-  duckduckgo: 'q',
-  bing: 'q',
-  ecosia: 'q',
-  baidu: 'word',
-  soguo: 'keyword',
-  so: 'q'
+  'search.yahoo': ['p'],
+  google: ['q'],
+  duckduckgo: ['q'],
+  bing: ['q'],
+  ecosia: ['q'],
+  baidu: ['wd', 'word'],
+  sogou: ['query', 'keyword'],
+  so: ['q']
 }
 
 let latestFullData = {}
@@ -54,11 +56,12 @@ function validateData(json) {
   }
 }
 
+// Listener must return true when responding asynchronously
 browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
   switch (request.message) {
     case 'popupWantsData': {
       loadData(() => sendResponse({ data: latestFullData }))
-      break
+      return true
     }
     case 'popupWantsToSave': {
       saveData({
@@ -71,31 +74,30 @@ browser.runtime.onMessage.addListener((request, _sender, sendResponse) => {
     }
     case 'popupWantsToImport': {
       try {
-        const json = JSON.parse(request.data)
-        json.timestamp = Date.now()
-        if (validateData(json)) {
-          if (json.version && json.version == CURRENT_VERSION) {
-            setData(json, () => sendResponse({ success: true }))
-          } else if (json.version && json.version < CURRENT_VERSION) {
-            const upgradedData = upgradeData(json)
-            saveData(upgradedData, () => sendResponse({ success: true }))
-          }
-        } else {
-          console.log('Error importing search data:', e, request.data)
-          sendResponse({ success: false })
+        let json = JSON.parse(request.data)
+        if (!json.version || json.version < CURRENT_VERSION) {
+          json = upgradeData(json)
         }
+        if (json.version == CURRENT_VERSION && validateData(json)) {
+          saveData({ ...json, timestamp: Date.now() }, () => sendResponse({ success: true }))
+          return true
+        }
+        console.log('Error importing search data: invalid data', request.data)
       } catch (e) {
-        sendResponse({ success: false })
         console.log('Error importing search data:', e, request.data)
       }
+      sendResponse({ success: false })
       break
     }
     case 'popupWantsToReset': {
-      saveData({
-        ...defaultSearches,
-        timestamp: Date.now()
-      })
-      break
+      saveData(
+        {
+          ...defaultSearches,
+          timestamp: Date.now()
+        },
+        () => sendResponse({ success: true })
+      )
+      return true
     }
   }
 })
@@ -160,7 +162,7 @@ function upgradeData(oldData) {
       },
       searches: oldData.data.map(d => {
         const n = {
-          name: d.name,
+          name: d.name || '',
           keywords: d.keyword,
           expansion: d.expansion,
           allowedLocations: 'default'
@@ -202,30 +204,51 @@ function saveData(data, andThen) {
 }
 
 let lastLoad = 0
+// Callbacks waiting for an in-flight load, null when no load is running
+let pendingLoadCallbacks = null
 function loadData(andThen) {
-  const now = Date.now()
-  if (now - lastLoad > 200) {
-    lastLoad = now
-    browser.runtime.sendNativeMessage('application.id', message('loadData'), response => {
-      if (response == '') {
-        saveData(defaultSearches, andThen)
-      } else {
-        try {
-          const json = JSON.parse(response)
-          if (json.version && json.version == CURRENT_VERSION) {
-            setData(json, andThen)
-          } else {
-            const upgradedData = upgradeData(json)
-            saveData(upgradedData, andThen)
-          }
-        } catch (e) {
-          console.log('Error parsing search data:', e, response)
-        }
-      }
-    })
-  } else {
-    if (andThen) andThen()
+  if (pendingLoadCallbacks) {
+    if (andThen) pendingLoadCallbacks.push(andThen)
+    return
   }
+  const now = Date.now()
+  if (now - lastLoad <= 200) {
+    if (andThen) andThen()
+    return
+  }
+  lastLoad = now
+  pendingLoadCallbacks = andThen ? [andThen] : []
+
+  const done = () => {
+    if (!pendingLoadCallbacks) return
+    const callbacks = pendingLoadCallbacks
+    pendingLoadCallbacks = null
+    callbacks.forEach(cb => cb())
+  }
+  // Fall back to cached data if the native side never answers
+  setTimeout(done, 2000)
+
+  browser.runtime.sendNativeMessage('application.id', message('loadData'), response => {
+    if (response === undefined) {
+      console.log('Error loading search data:', browser.runtime.lastError)
+      done()
+    } else if (response == '') {
+      saveData(defaultSearches, done)
+    } else {
+      try {
+        const json = JSON.parse(response)
+        if (json.version && json.version == CURRENT_VERSION) {
+          setData(json, done)
+        } else {
+          const upgradedData = upgradeData(json)
+          saveData(upgradedData, done)
+        }
+      } catch (e) {
+        console.log('Error parsing search data:', e, response)
+        done()
+      }
+    }
+  })
 }
 
 loadData()
@@ -260,10 +283,11 @@ function getSearchParam(urlString) {
   const url = new URL(urlString)
   const matches = url.host.match(searchDomainRegex)
   if (matches) {
-    const urlParams = new URLSearchParams(url.search)
-    const searchParam = urlParams.get(searchEngineParameters[matches[2]])
-    if (searchParam) {
-      return searchParam
+    for (const param of searchEngineParameters[matches[2]]) {
+      const searchParam = url.searchParams.get(param)
+      if (searchParam) {
+        return searchParam
+      }
     }
   }
 }
@@ -322,18 +346,18 @@ function doTheSearch(details) {
   }
 }
 
-let lastInvoked = 0
+const lastInvoked = new Map()
 function beforeNavigate(details) {
   if (details.parentFrameId == -1 && details.tabId > 0) {
     const now = Date.now()
-    if (now - lastInvoked > 500) {
+    if (now - (lastInvoked.get(details.tabId) || 0) > 500) {
       if (lastUpdate == -1) {
         loadData(() => doTheSearch(details))
       } else {
         doTheSearch(details)
         loadData()
       }
-      lastInvoked = now
+      lastInvoked.set(details.tabId, now)
     }
   }
 }
