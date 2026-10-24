@@ -130,7 +130,7 @@ function doTheSearch(details) {
   lastSearchUrl = ''
   lastSearched = Date.now()
   lastLoadedUrl = details.url
-  const searchParam = getSearchParam(details.url)
+  const searchParam = getSearchParam(details.url, index.settings.searchEngine)
   if (searchParam) {
     const searchUrl = getSearchUrl(searchParam, index)
     if (searchUrl) {

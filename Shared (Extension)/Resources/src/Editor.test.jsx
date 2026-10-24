@@ -129,3 +129,21 @@ test('each save sends what it was based on', () => {
   expect(second.base).toEqual({ searches: first.searches, settings: first.settings })
   expect(second.searches).toHaveLength(2)
 })
+
+test('choosing the search engine saves the setting', () => {
+  const { container, lastSaved } = setup()
+  const select = container.querySelector('select[name="searchEngine"]')
+  expect([...select.options].map(o => o.value)).toEqual([
+    'any',
+    'google',
+    'bing',
+    'duckduckgo',
+    'ecosia',
+    'yahoo',
+    'baidu',
+    'sogou',
+    'so'
+  ])
+  fireEvent.change(select, { target: { value: 'duckduckgo' } })
+  expect(lastSaved().settings).toEqual({ allowedLocations: 'frontOnly', searchEngine: 'duckduckgo' })
+})

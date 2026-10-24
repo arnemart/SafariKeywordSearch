@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { ensureIds } from './data.js'
+import { searchEngines } from './search.js'
 
 const keywordRegex = /\S+/
 const urlRegex = /^https?:\/\/.+/
@@ -209,6 +210,21 @@ const Settings = ({ settings, save, exportData, importData, reload, resetData })
             options={[
               { name: 'Front only', value: 'frontOnly' },
               { name: 'Front and end', value: 'frontAndEnd' }
+            ]}
+            vals={settings}
+            update={(key, val) => save({ [key]: val })}
+            errors={{}}
+          />
+        </li>
+        <li className="list__item no-caret">
+          <FormFieldWithHelpTextEtc
+            name="searchEngine"
+            label="Safari’s search engine"
+            helpText="Choose the search engine set in Safari’s settings to only use keywords when searching from the address bar, and not when searching on the search engine’s website. “Any” works with all search engines."
+            type="select"
+            options={[
+              { name: 'Any', value: 'any' },
+              ...Object.entries(searchEngines).map(([value, e]) => ({ name: e.name, value }))
             ]}
             vals={settings}
             update={(key, val) => save({ [key]: val })}

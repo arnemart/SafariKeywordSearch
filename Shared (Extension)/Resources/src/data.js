@@ -4,7 +4,8 @@ export const defaultSearches = {
   version: CURRENT_VERSION,
   timestamp: 0,
   settings: {
-    allowedLocations: 'frontOnly'
+    allowedLocations: 'frontOnly',
+    searchEngine: 'any'
   },
   searches: [
     { name: 'Amazon', keywords: 'a', expansion: 'https://www.amazon.com/s?k=@@@' },
