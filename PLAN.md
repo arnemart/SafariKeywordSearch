@@ -66,7 +66,7 @@ Done:
 
 Tested by hand: upgrade, editing, sync between new devices and with the App Store version. Fixed along the way: Swift 6 trap in the macOS app (SafariServices completion handlers called off the main thread → async/await). Version set to 3.0 (manifest + MARKETING_VERSION). Tombstones are never pruned (small; can be revisited).
 
-## 4. Default-engine setting — implemented on branch `default-engine`, not tested in Safari
+## 4. Default-engine setting — done (tested in Safari)
 
 - `search.js`: table `searchEngines` (name, domain, query parameters, `fromSafari` = recognizes Safari's marker). Markers: Google `client=safari` · Bing `form` starting with `AP` · DDG `t` ∈ osx/iphone/ipad · Ecosia `tts` starting with `st_asaf_` · Yahoo `fr` aapl…/iphone/ipad or `.tsrc=apple`. Baidu, Sogou and 360 match on domain only (not tested).
 - Setting `searchEngine` (default `any` = previous behavior). With an engine selected, only that engine triggers, and only for searches from Safari's address bar.
