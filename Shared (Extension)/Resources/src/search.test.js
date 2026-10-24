@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test, describe, expect } from 'vitest'
 import assert from 'node:assert/strict'
 import { getSearchParam, getSearchUrl, buildIndex } from './search.js'
 import { defaultSearches } from './data.js'
@@ -84,4 +84,74 @@ test('getSearchUrl keyword at the end', () => {
   ]
   assert.equal(getSearchUrl('x a', buildIndex({ searches, settings: { allowedLocations: 'frontOnly' } })), 'https://a/x')
   assert.equal(getSearchUrl('x b', buildIndex({ searches, settings: { allowedLocations: 'frontAndEnd' } })), undefined)
+})
+
+describe('searchEngine setting', () => {
+  // The URLs Safari generated for "monkey" (PLAN.md)
+  const safariUrls = {
+    duckduckgo: [
+      'https://duckduckgo.com/?q=monkey&t=osx&ia=web',
+      'https://duckduckgo.com/?q=monkey&t=iphone&ia=web',
+      'https://duckduckgo.com/?q=monkey&t=ipad&ia=web'
+    ],
+    google: [
+      'https://www.google.com/search?client=safari&rls=en&q=monkey&ie=UTF-8&oe=UTF-8',
+      'https://www.google.com/search?q=monkey&ie=UTF-8&oe=UTF-8&hl=en&client=safari&iga=1&utm_campaign=safari_share_1',
+      'https://www.google.com/search?q=monkey&ie=UTF-8&oe=UTF-8&hl=en-us&client=safari&sei=Y37caqLnI7adi-gPwZjAwQs'
+    ],
+    yahoo: [
+      'https://search.yahoo.com/search?ei=utf-8&fr=aaplw&p=monkey',
+      'https://no.search.yahoo.com/search?p=monkey&fr=iphone&.tsrc=apple',
+      'https://no.search.yahoo.com/search?p=monkey&fr=ipad'
+    ],
+    bing: [
+      'https://www.bing.com/search?q=monkey&form=APMCS1&PC=APMC',
+      'https://www.bing.com/search?q=monkey&form=APIPH1&PC=APPL',
+      'https://www.bing.com/search?q=monkey&form=APIPA1&PC=APPD'
+    ],
+    ecosia: [
+      'https://www.ecosia.org/search?q=monkey&tts=st_asaf_macos',
+      'https://www.ecosia.org/search?q=monkey&tts=st_asaf_iphone',
+      'https://www.ecosia.org/search?q=monkey&tts=st_asaf_ipad'
+    ]
+  }
+  // Searches made on the engine's own website
+  const websiteUrls = {
+    duckduckgo: 'https://duckduckgo.com/?q=monkey&ia=web',
+    google: 'https://www.google.com/search?q=monkey&sca_esv=123&source=hp',
+    yahoo: 'https://search.yahoo.com/search?p=monkey&fr=yfp-t',
+    bing: 'https://www.bing.com/search?q=monkey&form=QBLH',
+    ecosia: 'https://www.ecosia.org/search?method=index&q=monkey'
+  }
+
+  for (const [engine, urls] of Object.entries(safariUrls)) {
+    test(`${engine}: matches Safari's searches only`, () => {
+      for (const url of urls) {
+        expect(getSearchParam(url, engine), url).toBe('monkey')
+        expect(getSearchParam(url, 'any'), url).toBe('monkey')
+      }
+      expect(getSearchParam(websiteUrls[engine], engine)).toBeUndefined()
+      expect(getSearchParam(websiteUrls[engine], 'any')).toBe('monkey')
+    })
+
+    test(`${engine}: other engines' searches are ignored`, () => {
+      for (const [other, otherUrls] of Object.entries(safariUrls)) {
+        if (other == engine) continue
+        for (const url of otherUrls) {
+          expect(getSearchParam(url, engine), url).toBeUndefined()
+        }
+      }
+    })
+  }
+
+  test('regional engines match on domain only', () => {
+    expect(getSearchParam('https://www.baidu.com/s?wd=monkey', 'baidu')).toBe('monkey')
+    expect(getSearchParam('https://m.sogou.com/web/searchList.jsp?keyword=monkey', 'sogou')).toBe('monkey')
+    expect(getSearchParam('https://www.so.com/s?q=monkey', 'so')).toBe('monkey')
+    expect(getSearchParam('https://www.baidu.com/s?wd=monkey', 'so')).toBeUndefined()
+  })
+
+  test('no setting means any engine', () => {
+    expect(getSearchParam('https://www.google.com/search?q=monkey')).toBe('monkey')
+  })
 })

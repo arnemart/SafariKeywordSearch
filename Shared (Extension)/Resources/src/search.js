@@ -2,26 +2,62 @@
 const searchDomainRegex =
   /^(?:www\.|m\.|[a-z]{2,10}\.(?=search\.yahoo\.))?(search\.yahoo|google|duckduckgo|bing|ecosia|baidu|sogou|so)(\.[a-z]{2,}){1,2}$/
 
-const searchEngineParameters = {
-  'search.yahoo': ['p'],
-  google: ['q'],
-  duckduckgo: ['q'],
-  bing: ['q'],
-  ecosia: ['q'],
-  baidu: ['wd', 'word'],
-  sogou: ['query', 'keyword'],
-  so: ['q']
+// The search engines Safari can use. `fromSafari` recognizes the parameters Safari adds to searches from the
+// address bar (see the URL table in PLAN.md); engines without it could not be tested and match on domain only.
+export const searchEngines = {
+  google: {
+    name: 'Google',
+    domain: 'google',
+    params: ['q'],
+    fromSafari: p => p.get('client') == 'safari'
+  },
+  bing: {
+    name: 'Bing',
+    domain: 'bing',
+    params: ['q'],
+    fromSafari: p => /^AP/.test(p.get('form') || '')
+  },
+  duckduckgo: {
+    name: 'DuckDuckGo',
+    domain: 'duckduckgo',
+    params: ['q'],
+    fromSafari: p => ['osx', 'iphone', 'ipad'].includes(p.get('t'))
+  },
+  ecosia: {
+    name: 'Ecosia',
+    domain: 'ecosia',
+    params: ['q'],
+    fromSafari: p => (p.get('tts') || '').startsWith('st_asaf_')
+  },
+  yahoo: {
+    name: 'Yahoo',
+    domain: 'search.yahoo',
+    params: ['p'],
+    fromSafari: p => /^(aapl|iphone$|ipad$)/.test(p.get('fr') || '') || p.get('.tsrc') == 'apple'
+  },
+  baidu: { name: 'Baidu', domain: 'baidu', params: ['wd', 'word'] },
+  sogou: { name: 'Sogou', domain: 'sogou', params: ['query', 'keyword'] },
+  so: { name: '360 Search', domain: 'so', params: ['q'] }
 }
 
-export function getSearchParam(urlString) {
+const enginesByDomain = Object.fromEntries(Object.entries(searchEngines).map(([id, e]) => [e.domain, id]))
+
+// `engine` is the searchEngine setting: 'any' matches all engines, including searches made on the engine's own
+// site. A specific engine only matches searches Safari made from the address bar, where that can be recognized.
+export function getSearchParam(urlString, engine = 'any') {
   const url = new URL(urlString)
   const matches = url.host.match(searchDomainRegex)
-  if (matches) {
-    for (const param of searchEngineParameters[matches[1]]) {
-      const searchParam = url.searchParams.get(param)
-      if (searchParam) {
-        return searchParam
-      }
+  if (!matches) return
+
+  const id = enginesByDomain[matches[1]]
+  const definition = searchEngines[id]
+  if (engine != 'any' && (id != engine || (definition.fromSafari && !definition.fromSafari(url.searchParams)))) {
+    return
+  }
+  for (const param of definition.params) {
+    const searchParam = url.searchParams.get(param)
+    if (searchParam) {
+      return searchParam
     }
   }
 }
