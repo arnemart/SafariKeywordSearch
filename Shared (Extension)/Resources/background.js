@@ -283,7 +283,7 @@ function getSearchParam(urlString) {
   const url = new URL(urlString)
   const matches = url.host.match(searchDomainRegex)
   if (matches) {
-    for (const param of searchEngineParameters[matches[2]]) {
+    for (const param of searchEngineParameters[matches[1]]) {
       const searchParam = url.searchParams.get(param)
       if (searchParam) {
         return searchParam
