@@ -15,18 +15,18 @@ export const defaultSearches = {
       expansion: 'https://web.archive.org/web/*/@@@',
       escape: false
     },
-    { name: 'DuckDuckGo', keywords: 'd, ddg', expansion: 'https://duckduckgo.com/?q=@@@' },
+    { name: 'DuckDuckGo', keywords: 'ddg', expansion: 'https://duckduckgo.com/?q=@@@' },
     {
       name: 'Down for everyone or just me',
       keywords: 'down',
       expansion: 'https://downforeveryoneorjustme.com/@@@',
       escape: false
     },
-    { name: 'Ebay', keywords: 'e, ebay', expansion: 'https://www.ebay.com/sch/i.html?_nkw=@@@' },
+    { name: 'Ebay', keywords: 'ebay', expansion: 'https://www.ebay.com/sch/i.html?_nkw=@@@' },
     { name: 'Google', keywords: 'g', expansion: 'https://www.google.com/search?q=@@@' },
     { name: 'Google maps', keywords: 'gm, gmaps', expansion: 'https://www.google.com/maps?oi=map&q=@@@' },
     { name: 'Google images', keywords: 'gi', expansion: 'https://www.google.com/search?udm=2&q=@@@' },
-    { name: 'IMDB', keywords: 'imdb', expansion: 'https://imdb.com/find?s=all&q=@@@' },
+    { name: 'IMDB', keywords: 'imdb', expansion: 'https://www.imdb.com/find/?q=@@@' },
     { name: 'Stack Overflow', keywords: 'so', expansion: 'https://stackoverflow.com/search?q=@@@' },
     {
       name: 'Wikipedia',

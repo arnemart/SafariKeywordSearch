@@ -8,11 +8,11 @@ Safari Keyword Search is a simple extension for Safari on macOS and iOS that let
 
 The following searches are included in the default set:
 
-- **az**: amazon.com
 - **ao**: archive.org waybackmachine
-- **d**: duckduckgo.com
+- **az**: amazon.com
+- **ddg**: duckduckgo.com
 - **down**: downforeveryoneorjustme.com
-- **e**: ebay.com
+- **ebay**: ebay.com
 - **g**: google search
 - **gi**: google image search
 - **gm**: google maps
