@@ -73,9 +73,17 @@ Tested by hand: upgrade, editing, sync between new devices and with the App Stor
 - Dropdown "Safari’s search engine" under Other settings. Syncs like other settings (per key).
 - Tests (13 new): every collected URL (Mac/iPhone/iPad) matches its own engine, not others; the same search without the marker (from the engine's website) is ignored with an engine selected but works with "Any".
 
-## 5. declarativeNetRequest — todo
+## 5. declarativeNetRequest — dropped
 
-Redirect before the request is sent, using dynamic rules with `regexSubstitution`, per platform (parameter order differs). `webNavigation` remains as the fallback (custom spaceReplacer, `escape: false`, unknown parameter order). Then consider MV3.
+Prototype on branch `dnr-prototype` (kept for reference): dynamic rules with `regexFilter` + `regexSubstitution` for `y` on Google/DDG, JS fallback disabled for those URLs.
+
+Findings (Safari 27, macOS):
+- Rules were accepted, including `isUrlFilterCaseSensitive: false`, and the redirect happens.
+- `regexSubstitution` only replaces the matched part of the URL, so the regex must end with `.*` or the rest of the search URL is appended to the target.
+- The original search URL still fires `onBeforeNavigate`, so the JS fallback has to skip URLs covered by DNR, otherwise it navigates twice.
+- Flaky: Safari regularly reloaded the page ("This webpage was reloaded because of a problem"). Crash reports: `ExcUserFault_Safari` (EXC_GUARD) in `WebKit::WebPageProxy::didStartProvisionalLoadForFrameShared`, i.e. WebKit's own consistency check during the redirected main-frame navigation (cross-site, with process swap). Not caused by our code; possibly related to Safari preloading search results while typing (a `y+monk` event appeared while typing `y monk…`).
+
+Decision: too fragile to rely on. `webNavigation` + `tabs.update` stays the mechanism. Possible later: report to WebKit with a minimal repro; investigate whether Safari's preloading of partial queries makes the JS approach trigger on half-typed text.
 
 ## Safari's search URLs ("monkey")
 
