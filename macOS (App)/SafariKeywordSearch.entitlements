@@ -6,7 +6,5 @@
 	<array>
 		<string>group.5YSSE2V8P3.net.aurlien.SafariKeywordSearch</string>
 	</array>
-	<key>com.apple.security.network.client</key>
-	<true/>
 </dict>
 </plist>
