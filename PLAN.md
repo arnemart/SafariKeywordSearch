@@ -82,9 +82,9 @@ Findings (Safari 27, macOS):
 - No permission prompt appeared, even though the manifest added `declarativeNetRequestWithHostAccess` and host permissions for google.com/duckduckgo.com (development build); the redirect worked anyway.
 - `regexSubstitution` only replaces the matched part of the URL, so the regex must end with `.*` or the rest of the search URL is appended to the target.
 - The original search URL still fires `onBeforeNavigate`, so the JS fallback has to skip URLs covered by DNR, otherwise it navigates twice.
-- Flaky: Safari regularly reloaded the page ("This webpage was reloaded because of a problem"). Crash reports: `ExcUserFault_Safari` (EXC_GUARD) in `WebKit::WebPageProxy::didStartProvisionalLoadForFrameShared`, i.e. WebKit's own consistency check during the redirected main-frame navigation (cross-site, with process swap). Not caused by our code; possibly related to Safari preloading search results while typing (a `y+monk` event appeared while typing `y monk…`).
+- Flaky: Safari regularly reloaded the page ("This webpage was reloaded because of a problem"). Crash reports: `ExcUserFault_Safari` (EXC_GUARD) in `WebKit::WebPageProxy::didStartProvisionalLoadForFrameShared`, i.e. WebKit's own consistency check during the redirected main-frame navigation (cross-site, with process swap). Not caused by our code. The YouTube `monkey` events after the Google search `y monk` were Safari reloading the previous page after the crash, not the redirect.
 
-Decision: too fragile to rely on. `webNavigation` + `tabs.update` stays the mechanism. Possible later: report to WebKit with a minimal repro; investigate whether Safari's preloading of partial queries makes the JS approach trigger on half-typed text.
+Decision: too fragile to rely on. `webNavigation` + `tabs.update` stays the mechanism. Possible later: report to WebKit with a minimal repro.
 
 ## Safari's search URLs ("monkey")
 
