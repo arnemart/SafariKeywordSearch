@@ -8,7 +8,7 @@ export const defaultSearches = {
     searchEngine: 'any'
   },
   searches: [
-    { name: 'Amazon', keywords: 'a', expansion: 'https://www.amazon.com/s?k=@@@' },
+    { name: 'Amazon', keywords: 'az', expansion: 'https://www.amazon.com/s?k=@@@' },
     {
       name: 'Archive.org Wayback Machine',
       keywords: 'ao, wm',
@@ -25,7 +25,7 @@ export const defaultSearches = {
     { name: 'Ebay', keywords: 'e, ebay', expansion: 'https://www.ebay.com/sch/i.html?_nkw=@@@' },
     { name: 'Google', keywords: 'g', expansion: 'https://www.google.com/search?q=@@@' },
     { name: 'Google maps', keywords: 'gm, gmaps', expansion: 'https://www.google.com/maps?oi=map&q=@@@' },
-    { name: 'Google images', keywords: 'i, gi', expansion: 'https://www.google.com/search?tbm=isch&q=@@@&tbs=imgo:1' },
+    { name: 'Google images', keywords: 'gi', expansion: 'https://www.google.com/search?udm=2&q=@@@' },
     { name: 'IMDB', keywords: 'imdb', expansion: 'https://imdb.com/find?s=all&q=@@@' },
     { name: 'Stack Overflow', keywords: 'so', expansion: 'https://stackoverflow.com/search?q=@@@' },
     {
