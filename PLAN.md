@@ -79,6 +79,7 @@ Prototype on branch `dnr-prototype` (kept for reference): dynamic rules with `re
 
 Findings (Safari 27, macOS):
 - Rules were accepted, including `isUrlFilterCaseSensitive: false`, and the redirect happens.
+- No permission prompt appeared, even though the manifest added `declarativeNetRequestWithHostAccess` and host permissions for google.com/duckduckgo.com (development build); the redirect worked anyway.
 - `regexSubstitution` only replaces the matched part of the URL, so the regex must end with `.*` or the rest of the search URL is appended to the target.
 - The original search URL still fires `onBeforeNavigate`, so the JS fallback has to skip URLs covered by DNR, otherwise it navigates twice.
 - Flaky: Safari regularly reloaded the page ("This webpage was reloaded because of a problem"). Crash reports: `ExcUserFault_Safari` (EXC_GUARD) in `WebKit::WebPageProxy::didStartProvisionalLoadForFrameShared`, i.e. WebKit's own consistency check during the redirected main-frame navigation (cross-site, with process swap). Not caused by our code; possibly related to Safari preloading search results while typing (a `y+monk` event appeared while typing `y monk…`).
