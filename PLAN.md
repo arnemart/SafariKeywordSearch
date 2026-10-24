@@ -38,7 +38,7 @@ Minimum: Safari 17 (iOS 17, macOS 12+ with Safari 17). The Safari permission pro
 - Tested by hand in the iOS simulator.
 - Swift 6 / project upgrade postponed to step 3 (Data.swift is rewritten there anyway).
 
-## 3. Sync — implemented, being tested
+## 3. Sync — done
 
 **Requirement: tests for upgrading from any older version to any newer one.** Fixtures with real data from each format (v1, v2, v3 without ids, v3 with ids, the new sync format), and tests that each one is upgraded correctly to every newer version. Also cross-version: an old app on another device that reads/writes the new format via iCloud (e.g. the old Editor drops `id` and unknown fields when a search is saved), so it must not break or lose data.
 
@@ -64,7 +64,7 @@ Done:
 - Swift: `Data.swift` is a raw store (`load`/`save` of keys v1/v3/v4, locally and iCloud), the handler logs iCloud quota/account changes. Swift 6, both schemes build.
 - Note: Xcode MCP builds get cancelled when `project.pbxproj` has just changed on disk (Xcode reloads the project silently).
 
-Remaining: test in Safari, including together with the App Store version (old version) on another device. Tombstones are never pruned (small; can be revisited).
+Tested by hand: upgrade, editing, sync between new devices and with the App Store version. Fixed along the way: Swift 6 trap in the macOS app (SafariServices completion handlers called off the main thread → async/await). Version set to 3.0 (manifest + MARKETING_VERSION). Tombstones are never pruned (small; can be revisited).
 
 ## 4. Default-engine setting — todo
 
