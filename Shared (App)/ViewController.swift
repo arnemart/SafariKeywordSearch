@@ -42,29 +42,24 @@ class ViewController: PlatformViewController, WKNavigationDelegate, WKScriptMess
 #elseif os(macOS)
         webView.evaluateJavaScript("show('mac')")
 
-        SFSafariExtensionManager.getStateOfSafariExtension(withIdentifier: extensionBundleIdentifier) { (state, error) in
-            guard let state = state, error == nil else {
-                // Insert code to inform the user that something went wrong.
+        // async instead of a completion handler: under Swift 6 the handler would be main-actor isolated but
+        // called on a background queue, which traps at runtime
+        Task {
+            guard let state = try? await SFSafariExtensionManager.stateOfSafariExtension(withIdentifier: extensionBundleIdentifier) else {
                 return
             }
-
-            DispatchQueue.main.async {
-                webView.evaluateJavaScript("show('mac', \(state.isEnabled))")
-            }
+            _ = try? await webView.evaluateJavaScript("show('mac', \(state.isEnabled))")
         }
 #endif
     }
 
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        if (message.body as! String != "open-preferences") {
+        if (message.body as? String != "open-preferences") {
             return;
         }
 #if os(macOS)
-        SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier) { error in
-            guard error == nil else {
-                // Insert code to inform the user that something went wrong.
-                return
-            }
+        Task {
+            try? await SFSafariApplication.showPreferencesForExtension(withIdentifier: extensionBundleIdentifier)
         }
 #elseif os(iOS)
         guard let settingsUrl = URL(string: UIApplication.openSettingsURLString) else {
