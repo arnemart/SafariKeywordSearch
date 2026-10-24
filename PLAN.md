@@ -23,7 +23,8 @@ Minimum: Safari 17 (iOS 17, macOS 12+ with Safari 17). The Safari permission pro
 - Build
   - Removed `dist/` and source maps from git; `npm run build` without source maps. `popup.js` stays committed until step 2 (Xcode references it directly).
   - Deployment target macOS 11 → 12 (Xcode no longer supports 11), iOS 15 → 17.
-  - Both schemes build (unsigned). Not tested in Safari yet.
+  - Xcode's "recommended settings" applied (Xcode 27). Run Script phase (`npm run build`) finds node via fnm/Homebrew (Xcode does not get the shell PATH), runs `npm ci` if needed, warns instead of failing without npm. `ENABLE_USER_SCRIPT_SANDBOXING = NO` on the extension targets, because the script writes `popup.js` to the source folder.
+  - Both schemes build (unsigned, with Xcode's PATH). Not tested in Safari yet.
 
 ## 2. Dependencies and Editor refactor — todo
 
