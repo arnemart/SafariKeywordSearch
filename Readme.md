@@ -40,6 +40,10 @@ Your searches and settings sync between your devices through iCloud. Changes mad
 
 Requires Safari 17 or later (iOS 17, macOS 12 or later).
 
+### Permissions
+
+Safari asks for permission before the extension can see your searches. Keyword Search only needs access to the search engine Safari uses (e.g. google.com), not to the sites it sends you to. If you switch search engines, either allow access on every website or allow the new search engine too.
+
 If you want to contribute a PR, feel free. Let me warn you, the source code is a lot like a garbage fire at a spaghetti factory.
 
 ### Did the extension disappear from Safari on macOS?
