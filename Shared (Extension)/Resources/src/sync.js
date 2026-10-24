@@ -1,4 +1,4 @@
-// Sync between devices via iCloud key-value storage (see PLAN.md, step 3).
+// Sync between devices via iCloud key-value storage.
 //
 // State (v4) is merged per search, so changes from several devices survive:
 // {

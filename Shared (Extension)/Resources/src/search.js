@@ -3,7 +3,7 @@ const searchDomainRegex =
   /^(?:www\.|m\.|[a-z]{2,10}\.(?=search\.yahoo\.))?(search\.yahoo|google|duckduckgo|bing|ecosia|baidu|sogou|so)(\.[a-z]{2,}){1,2}$/
 
 // The search engines Safari can use. `fromSafari` recognizes the parameters Safari adds to searches from the
-// address bar (see the URL table in PLAN.md); engines without it could not be tested and match on domain only.
+// address bar (see the URLs in search.test.js); engines without it could not be tested and match on domain only.
 export const searchEngines = {
   google: {
     name: 'Google',

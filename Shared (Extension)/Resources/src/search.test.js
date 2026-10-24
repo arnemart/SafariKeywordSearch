@@ -87,7 +87,7 @@ test('getSearchUrl keyword at the end', () => {
 })
 
 describe('searchEngine setting', () => {
-  // The URLs Safari generated for "monkey" (PLAN.md)
+  // The URLs Safari generated for "monkey" on Mac, iPhone and iPad
   const safariUrls = {
     duckduckgo: [
       'https://duckduckgo.com/?q=monkey&t=osx&ia=web',
